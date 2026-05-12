@@ -11,15 +11,15 @@ export default {
       },
       colors: {
         paper: {
-          DEFAULT: '#F4ECDB',
-          light: '#FAF4E5',
-          dark: '#E8DEC5',
+          DEFAULT: '#FFFFFF',
+          light: '#FBFAF7',
+          dark: '#F2F0EA',
         },
         ink: {
           DEFAULT: '#1B1714',
           soft: '#3A332C',
           mute: '#7B7264',
-          line: '#C9BFA9',
+          line: '#E0DCD3',
         },
         petrol: {
           DEFAULT: '#1A5868',
@@ -72,8 +72,8 @@ export default {
         'ink-xs': '1px 1px 0 0 #1B1714',
         petrol: '4px 4px 0 0 #1A5868',
         'petrol-sm': '2px 2px 0 0 #1A5868',
-        soft: '0 1px 0 0 #C9BFA9',
-        card: '0 1px 0 #C9BFA9, 0 4px 12px -6px rgba(27,23,20,0.08)',
+        soft: '0 1px 0 0 #E0DCD3',
+        card: '0 1px 2px 0 rgba(27,23,20,0.04), 0 4px 14px -6px rgba(27,23,20,0.07)',
       },
       keyframes: {
         'fade-up': {

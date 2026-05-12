@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --paper: #F4ECDB;
-  --paper-light: #FAF4E5;
-  --paper-dark: #E8DEC5;
+  --paper: #FFFFFF;
+  --paper-light: #FBFAF7;
+  --paper-dark: #F2F0EA;
   --ink: #1B1714;
   --ink-soft: #3A332C;
   --ink-mute: #7B7264;
-  --ink-line: #C9BFA9;
+  --ink-line: #E0DCD3;
   --petrol: #1A5868;
   --petrol-soft: #2C7689;
   --brick: #B85C38;
@@ -28,9 +28,6 @@
     font-weight: 400;
     color: var(--ink);
     background-color: var(--paper);
-    background-image:
-      radial-gradient(rgba(27,23,20,0.022) 1px, transparent 1px);
-    background-size: 18px 18px;
     line-height: 1.65;
     text-align: right;
     font-feature-settings: 'kern' 1, 'liga' 1;
@@ -44,7 +41,7 @@
   }
   ::selection {
     background: var(--petrol);
-    color: var(--paper-light);
+    color: var(--paper);
   }
   button { font-family: inherit; }
   input, select, textarea {
@@ -53,7 +50,7 @@
   }
   input::placeholder, textarea::placeholder {
     color: var(--ink-mute);
-    opacity: 0.7;
+    opacity: 0.6;
   }
   hr { border-color: var(--ink-line); }
   a { color: inherit; }
@@ -125,7 +122,7 @@
   .card-elev {
     background: var(--paper-light);
     border: 1px solid var(--ink-line);
-    box-shadow: 0 1px 0 #C9BFA9, 0 4px 14px -8px rgba(27,23,20,0.08);
+    box-shadow: 0 1px 2px 0 rgba(27,23,20,0.04), 0 4px 14px -6px rgba(27,23,20,0.07);
   }
 }
 
