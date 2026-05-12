@@ -7,6 +7,7 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   ResponsiveContainer,
+  Tooltip,
 } from 'recharts';
 import Sidebar from '../components/layout/Sidebar';
 import PageHeader from '../components/layout/Header';
@@ -42,6 +43,48 @@ function CustomAxisTick({ x, y, payload, textAnchor }) {
     >
       {payload?.value}
     </text>
+  );
+}
+
+function RadarTooltip({ active, payload }) {
+  if (!active || !payload || !payload.length) return null;
+  const point = payload[0]?.payload;
+  if (!point) return null;
+  const { dim, candidate, ideal } = point;
+  const diff = candidate - ideal;
+  const absDiff = Math.abs(diff);
+  const diffColor =
+    absDiff <= 10 ? 'text-forest' : absDiff <= 20 ? 'text-ochre' : 'text-oxblood';
+  const diffLabel = diff === 0 ? 'תואם' : diff > 0 ? `+${diff} מעל` : `${diff} מתחת`;
+  const dimColor = nameToStroke[dim] || '#1B1714';
+
+  return (
+    <div
+      className="bg-paper-light border-2 border-ink shadow-ink-sm min-w-[200px] text-right"
+      dir="rtl"
+    >
+      <div
+        className="flex items-center gap-2 px-3.5 py-2 border-b border-ink-line"
+        style={{ background: `${dimColor}14` }}
+      >
+        <span className="w-2 h-2 rounded-full" style={{ background: dimColor }} />
+        <span className="display text-[15px] text-ink leading-none">{dim}</span>
+      </div>
+      <div className="px-3.5 py-2.5 space-y-1.5">
+        <div className="flex items-baseline justify-between gap-4">
+          <span className="eyebrow text-ink-mute leading-none">מועמד</span>
+          <span className="num text-2xl text-ink leading-none" dir="ltr">{candidate}</span>
+        </div>
+        <div className="flex items-baseline justify-between gap-4">
+          <span className="eyebrow text-ink-mute leading-none">נורמה</span>
+          <span className="num text-2xl text-ink-soft leading-none" dir="ltr">{ideal}</span>
+        </div>
+        <div className="border-t border-ink-line pt-1.5 mt-1.5 flex items-baseline justify-between gap-4">
+          <span className="eyebrow text-ink-mute leading-none">הפרש</span>
+          <span className={`num text-sm font-medium leading-none ${diffColor}`} dir="ltr">{diffLabel}</span>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -195,11 +238,11 @@ export default function Report() {
                 <h2 className="display text-2xl text-ink">פרופיל אישיות</h2>
               </div>
               <div className="flex items-center gap-4 text-[11px] uppercase tracking-widish">
-                <span className="flex items-center gap-2 text-ink font-medium">
-                  <span className="w-4 h-[3px] bg-ink" /> המועמד
+                <span className="flex items-center gap-2 text-petrol font-medium">
+                  <span className="w-4 h-[3px] bg-petrol" /> המועמד
                 </span>
-                <span className="flex items-center gap-2 text-ink-mute font-medium">
-                  <span className="w-4 border-t-[3px] border-dashed border-ink-mute" /> אידיאלי
+                <span className="flex items-center gap-2 text-brick font-medium">
+                  <span className="w-4 border-t-[3px] border-dashed border-brick" /> נורמה
                 </span>
               </div>
             </div>
@@ -207,6 +250,16 @@ export default function Report() {
             <div className="h-80 -mx-4">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={radarData} outerRadius="72%">
+                  <defs>
+                    <radialGradient id="candidateFill" cx="50%" cy="50%" r="60%">
+                      <stop offset="0%" stopColor="#1A5868" stopOpacity={0.10} />
+                      <stop offset="100%" stopColor="#1A5868" stopOpacity={0.30} />
+                    </radialGradient>
+                    <radialGradient id="idealFill" cx="50%" cy="50%" r="60%">
+                      <stop offset="0%" stopColor="#B85C38" stopOpacity={0.04} />
+                      <stop offset="100%" stopColor="#B85C38" stopOpacity={0.10} />
+                    </radialGradient>
+                  </defs>
                   <PolarGrid stroke="#E0DCD3" strokeDasharray="2 4" />
                   <PolarAngleAxis dataKey="dim" tick={<CustomAxisTick />} />
                   <PolarRadiusAxis
@@ -216,22 +269,27 @@ export default function Report() {
                     tickCount={5}
                     axisLine={false}
                   />
+                  <Tooltip
+                    content={<RadarTooltip />}
+                    cursor={{ stroke: '#1A5868', strokeWidth: 1, strokeDasharray: '3 3' }}
+                  />
+                  <Radar
+                    name="נורמה"
+                    dataKey="ideal"
+                    stroke="#B85C38"
+                    fill="url(#idealFill)"
+                    strokeWidth={2}
+                    strokeDasharray="5 3"
+                    dot={{ fill: '#B85C38', stroke: '#B85C38', r: 2.5 }}
+                  />
                   <Radar
                     name="המועמד"
                     dataKey="candidate"
-                    stroke="#1B1714"
-                    fill="#1B1714"
-                    fillOpacity={0.16}
-                    strokeWidth={2}
-                  />
-                  <Radar
-                    name="אידיאלי"
-                    dataKey="ideal"
-                    stroke="#7B7264"
-                    fill="#7B7264"
-                    fillOpacity={0.05}
-                    strokeWidth={1.5}
-                    strokeDasharray="5 3"
+                    stroke="#1A5868"
+                    fill="url(#candidateFill)"
+                    strokeWidth={2.5}
+                    dot={{ fill: '#FBFAF7', stroke: '#1A5868', strokeWidth: 2, r: 4 }}
+                    activeDot={{ fill: '#1A5868', stroke: '#FBFAF7', strokeWidth: 2, r: 6 }}
                   />
                 </RadarChart>
               </ResponsiveContainer>
