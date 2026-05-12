@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 const navItems = [
   { to: '/', label: 'דשבורד', n: '01', end: true },
   { to: '/new', label: 'מועמד חדש', n: '02' },
+  { to: '/roles', label: 'ניהול תפקידים', n: '03' },
 ];
 
 export default function Sidebar() {

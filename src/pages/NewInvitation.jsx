@@ -5,7 +5,6 @@ import PageHeader from '../components/layout/Header';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import RoleCard from '../components/recruiter/RoleCard';
-import { roles } from '../data/roles';
 import { useApp } from '../context/AppContext';
 
 function Field({ label, hint, error, children }) {
@@ -23,7 +22,7 @@ function Field({ label, hint, error, children }) {
 
 export default function NewInvitation() {
   const navigate = useNavigate();
-  const { createCandidate, showToast } = useApp();
+  const { createCandidate, showToast, roles } = useApp();
   const [roleId, setRoleId] = useState(null);
   const [form, setForm] = useState({ name: '', email: '', phone: '' });
   const [errors, setErrors] = useState({});

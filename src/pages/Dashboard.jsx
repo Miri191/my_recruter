@@ -8,7 +8,6 @@ import Card from '../components/ui/Card';
 import EmptyState from '../components/ui/EmptyState';
 import CandidateRow from '../components/recruiter/CandidateRow';
 import { useApp } from '../context/AppContext';
-import { roles, getRole } from '../data/roles';
 import { questions } from '../data/questions';
 import { calculateScores } from '../lib/scoring';
 import { calculateFit } from '../lib/fit';
@@ -49,7 +48,7 @@ function StatBlock({ eyebrow, value, suffix, note, accent, icon: Icon }) {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { candidates, deleteCandidate } = useApp();
+  const { candidates, deleteCandidate, roles, getRole } = useApp();
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');

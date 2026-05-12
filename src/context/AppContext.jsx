@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useReducer, useCallback, useMemo } from 'react';
+import { createContext, useContext, useEffect, useReducer, useState, useCallback, useMemo } from 'react';
 import { v4 as uuid } from 'uuid';
-import { loadAll, saveAll } from '../lib/storage';
+import { loadAll, saveAll, upsertCustomRole, removeCustomRole } from '../lib/storage';
+import { getRoles, isDefaultRoleId } from '../data/roles';
 
 const AppContext = createContext(null);
 
@@ -145,6 +146,30 @@ export function AppProvider({ children }) {
     dispatch({ type: 'TOAST', payload: null });
   }, []);
 
+  // ----- Roles -----
+  const [rolesVersion, setRolesVersion] = useState(0);
+  const roles = useMemo(() => getRoles(), [rolesVersion]);
+  const getRole = useCallback((id) => roles.find((r) => r.id === id), [roles]);
+
+  const saveRole = useCallback((role) => {
+    upsertCustomRole(role);
+    setRolesVersion((v) => v + 1);
+  }, []);
+
+  const deleteRole = useCallback(
+    (id) => {
+      removeCustomRole(id);
+      setRolesVersion((v) => v + 1);
+    },
+    []
+  );
+
+  const resetRole = useCallback((id) => {
+    if (!isDefaultRoleId(id)) return;
+    removeCustomRole(id);
+    setRolesVersion((v) => v + 1);
+  }, []);
+
   const value = useMemo(
     () => ({
       candidates: state.candidates,
@@ -157,8 +182,28 @@ export function AppProvider({ children }) {
       getCandidate,
       showToast,
       clearToast,
+      // Roles
+      roles,
+      getRole,
+      saveRole,
+      deleteRole,
+      resetRole,
     }),
-    [state, createCandidate, updateCandidate, submitAnswers, deleteCandidate, getCandidate, showToast, clearToast]
+    [
+      state,
+      createCandidate,
+      updateCandidate,
+      submitAnswers,
+      deleteCandidate,
+      getCandidate,
+      showToast,
+      clearToast,
+      roles,
+      getRole,
+      saveRole,
+      deleteRole,
+      resetRole,
+    ]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

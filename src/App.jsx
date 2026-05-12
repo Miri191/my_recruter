@@ -6,6 +6,7 @@ import CandidateLink from './pages/CandidateLink';
 import Questionnaire from './pages/Questionnaire';
 import ThankYou from './pages/ThankYou';
 import Report from './pages/Report';
+import Roles from './pages/Roles';
 import Toast from './components/ui/Toast';
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/new" element={<NewInvitation />} />
+        <Route path="/roles" element={<Roles />} />
         <Route path="/link/:id" element={<CandidateLink />} />
         <Route path="/q/:id" element={<Questionnaire />} />
         <Route path="/q/:id/done" element={<ThankYou />} />

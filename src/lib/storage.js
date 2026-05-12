@@ -106,3 +106,41 @@ export function getViewHistory(candidateId) {
 export function clearAuditLog() {
   localStorage.removeItem(AUDIT_KEY);
 }
+
+// ============================================================
+// CUSTOM ROLES — overrides for default roles + new user-created roles
+// ============================================================
+const ROLES_KEY = 'recruiter_custom_roles';
+
+export function loadCustomRoles() {
+  try {
+    const raw = localStorage.getItem(ROLES_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCustomRoles(roles) {
+  try {
+    localStorage.setItem(ROLES_KEY, JSON.stringify(roles || []));
+  } catch {
+    // localStorage full — fail silent
+  }
+}
+
+export function upsertCustomRole(role) {
+  const list = loadCustomRoles();
+  const idx = list.findIndex((r) => r.id === role.id);
+  if (idx >= 0) list[idx] = role;
+  else list.push(role);
+  saveCustomRoles(list);
+  return role;
+}
+
+export function removeCustomRole(id) {
+  const list = loadCustomRoles().filter((r) => r.id !== id);
+  saveCustomRoles(list);
+}
