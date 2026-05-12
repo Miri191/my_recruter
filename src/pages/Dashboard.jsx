@@ -86,19 +86,12 @@ export default function Dashboard() {
     });
   }, [candidates, search, roleFilter, statusFilter]);
 
-  const today = new Date().toLocaleDateString('he-IL', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  });
-
   return (
     <div className="flex min-h-screen">
       <Sidebar />
       <main className="flex-1 px-6 md:px-12 py-8 md:py-14 max-w-[1400px] w-full mx-auto">
         <PageHeader
-          eyebrow={`גליון יומי · ${today}`}
-          title="פנקס המועמדים"
+          title="רשימת המועמדים שלך"
           subtitle="כל המועמדים שהוזמנו לשאלון, סטטוס מילוי וציון התאמה משוקלל לתפקיד."
           action={
             <Button size="lg" onClick={() => navigate('/new')}>
