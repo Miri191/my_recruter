@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Radar,
@@ -9,12 +9,18 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
+import { History } from 'lucide-react';
 import Sidebar from '../components/layout/Sidebar';
 import PageHeader from '../components/layout/Header';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
 import Card from '../components/ui/Card';
 import ScoreBar from '../components/recruiter/ScoreBar';
+import AnalysisControls from '../components/report/AnalysisControls';
+import RedFlagsSection from '../components/report/RedFlagsSection';
+import WorkPatternsSection from '../components/report/WorkPatternsSection';
+import CultureFitSection from '../components/report/CultureFitSection';
+import ViewHistoryModal from '../components/report/ViewHistoryModal';
 import { useApp } from '../context/AppContext';
 import { getRole } from '../data/roles';
 import { questions } from '../data/questions';
@@ -22,6 +28,8 @@ import { dimensions, dimensionOrder } from '../data/dimensions';
 import { calculateScores } from '../lib/scoring';
 import { calculateFit, fitLabel } from '../lib/fit';
 import { generateInsights } from '../lib/insights';
+import { generateAdvancedAnalysis } from '../lib/advancedAnalysis';
+import { logView, getViewHistory } from '../lib/storage';
 
 const nameToStroke = Object.values(dimensions).reduce((acc, d) => {
   acc[d.name] = d.classes.stroke;
@@ -133,6 +141,18 @@ export default function Report() {
 
   const candidate = ready ? getCandidate(id) : null;
 
+  // Advanced analysis controls — default all on, medium depth, standard sector.
+  const [layers, setLayers] = useState(['redflags', 'patterns', 'culture']);
+  const [depth, setDepth] = useState('medium');
+  const [sector, setSector] = useState('standard');
+  const [historyOpen, setHistoryOpen] = useState(false);
+
+  const toggleLayer = (id) => {
+    setLayers((prev) =>
+      prev.includes(id) ? prev.filter((l) => l !== id) : [...prev, id]
+    );
+  };
+
   const report = useMemo(() => {
     if (!candidate || !candidate.answers) return null;
     const role = getRole(candidate.roleId);
@@ -147,6 +167,36 @@ export default function Report() {
     }));
     return { role, scores, fit, dimFit, insights, radarData };
   }, [candidate]);
+
+  // Advanced analysis — recomputes when scores/role/sector change. Other
+  // controls (layers/depth) only affect rendering, not computation.
+  const advanced = useMemo(() => {
+    if (!report) return null;
+    return generateAdvancedAnalysis(report.scores, report.role, {
+      layers: ['redflags', 'patterns', 'culture'],
+      depth,
+      sector,
+    });
+  }, [report, depth, sector]);
+
+  // Audit log: record one entry on initial mount of the candidate's report
+  // with the default settings. Compliance trail.
+  useEffect(() => {
+    if (!candidate || !advanced) return;
+    logView({
+      candidateId: candidate.id,
+      layersShown: layers,
+      depth,
+      sector,
+      flagsDisplayed: (advanced.redflags || []).map((f) => f.id),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [candidate?.id]);
+
+  const viewHistory = useMemo(
+    () => (candidate ? getViewHistory(candidate.id) : []),
+    [candidate, historyOpen]
+  );
 
   if (!ready) return null;
 
@@ -210,16 +260,39 @@ export default function Report() {
           back
           backTo="/"
           action={
-            <Button
-              variant="secondary"
-              onClick={() => {
-                console.log('PDF export — coming soon', { candidate, scores, fit });
-                alert('יצוא PDF — בקרוב');
-              }}
-            >
-              הורד PDF ↓
-            </Button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setHistoryOpen(true)}
+                className="inline-flex items-center gap-2 h-11 px-4 bg-paper-light border border-ink-line text-ink-soft hover:border-petrol hover:text-petrol transition-all text-[12px] tracking-widish uppercase font-medium"
+                title="היסטוריית צפיות"
+              >
+                <History size={14} />
+                <span className="hidden md:inline">היסטוריה</span>
+                <span className="num text-[11px] text-ink-mute" dir="ltr">
+                  ({viewHistory.length})
+                </span>
+              </button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  console.log('PDF export — coming soon', { candidate, scores, fit });
+                  alert('יצוא PDF — בקרוב');
+                }}
+              >
+                הורד PDF ↓
+              </Button>
+            </div>
           }
+        />
+
+        <AnalysisControls
+          layers={layers}
+          onToggleLayer={toggleLayer}
+          depth={depth}
+          onDepthChange={setDepth}
+          sector={sector}
+          onSectorChange={setSector}
         />
 
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12 items-stretch">
@@ -320,6 +393,24 @@ export default function Report() {
             <span className="text-oxblood font-medium">אדום — פער גדול</span>.
           </p>
         </Card>
+
+        {advanced && layers.includes('redflags') && (
+          <RedFlagsSection flags={advanced.redflags} depth={depth} />
+        )}
+
+        {advanced && layers.includes('patterns') && advanced.patterns && (
+          <WorkPatternsSection patterns={advanced.patterns} depth={depth} />
+        )}
+
+        {advanced && layers.includes('culture') && (
+          <CultureFitSection culture={advanced.culture} depth={depth} />
+        )}
+
+        <header className="flex items-baseline gap-4 mb-5">
+          <span className="num text-[11px] tracking-widish text-petrol font-semibold">D</span>
+          <h2 className="display text-2xl text-ink">סיכום והמלצות</h2>
+          <div className="flex-1 rule h-px" />
+        </header>
 
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-12">
           <Card variant="elev" accent="forest" padding="p-6">
@@ -431,6 +522,13 @@ export default function Report() {
           <span>BIG5 · IPIP 50</span>
         </footer>
       </main>
+
+      {historyOpen && (
+        <ViewHistoryModal
+          history={viewHistory}
+          onClose={() => setHistoryOpen(false)}
+        />
+      )}
     </div>
   );
 }

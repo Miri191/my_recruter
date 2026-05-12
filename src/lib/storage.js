@@ -65,3 +65,44 @@ export function deleteCandidate(id) {
 export function clearAll() {
   writeRaw(emptyState());
 }
+
+// ============================================================
+// AUDIT LOG — compliance trail of recruiter views
+// ============================================================
+const AUDIT_KEY = 'recruiter_audit_log';
+const AUDIT_MAX_ENTRIES = 200;
+
+function readAuditLog() {
+  try {
+    const raw = localStorage.getItem(AUDIT_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function logView(entry) {
+  const log = readAuditLog();
+  log.push({
+    ...entry,
+    viewedAt: entry.viewedAt || new Date().toISOString(),
+  });
+  const trimmed = log.slice(-AUDIT_MAX_ENTRIES);
+  try {
+    localStorage.setItem(AUDIT_KEY, JSON.stringify(trimmed));
+  } catch {
+    // localStorage full or unavailable — fail silent
+  }
+}
+
+export function getViewHistory(candidateId) {
+  const log = readAuditLog();
+  if (!candidateId) return log;
+  return log.filter((e) => e.candidateId === candidateId);
+}
+
+export function clearAuditLog() {
+  localStorage.removeItem(AUDIT_KEY);
+}
