@@ -4,8 +4,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        serif: ['"Frank Ruhl Libre"', 'Georgia', 'serif'],
-        display: ['"Frank Ruhl Libre"', 'Georgia', 'serif'],
+        serif: ['Heebo', 'system-ui', 'sans-serif'],
+        display: ['Heebo', 'system-ui', 'sans-serif'],
         sans: ['Heebo', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },

@@ -36,8 +36,8 @@ function CustomAxisTick({ x, y, payload, textAnchor }) {
       y={y}
       fill={color}
       fontSize={12}
-      fontFamily="Frank Ruhl Libre, serif"
-      fontWeight={500}
+      fontFamily="Heebo, sans-serif"
+      fontWeight={600}
       textAnchor={textAnchor}
       dy={4}
     >

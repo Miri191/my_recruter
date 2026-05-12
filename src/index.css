@@ -34,10 +34,10 @@
     -webkit-font-smoothing: antialiased;
   }
   h1, h2, h3, h4 {
-    font-family: 'Frank Ruhl Libre', Georgia, serif;
-    line-height: 1.15;
-    font-weight: 500;
-    letter-spacing: -0.005em;
+    font-family: 'Heebo', system-ui, sans-serif;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.015em;
   }
   ::selection {
     background: var(--petrol);
@@ -86,15 +86,16 @@
     background: var(--petrol);
   }
   .num {
-    font-family: 'Frank Ruhl Libre', Georgia, serif;
+    font-family: 'Heebo', system-ui, sans-serif;
     font-variant-numeric: tabular-nums;
     font-feature-settings: 'tnum' 1;
+    font-weight: 500;
   }
   .display {
-    font-family: 'Frank Ruhl Libre', Georgia, serif;
-    font-weight: 500;
-    line-height: 1.05;
-    letter-spacing: -0.015em;
+    font-family: 'Heebo', system-ui, sans-serif;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
   }
   .frame {
     border: 1px solid var(--ink);
