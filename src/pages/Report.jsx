@@ -535,6 +535,23 @@ export default function Report() {
           </Card>
         </section>
 
+        <section className="border-t border-ink-line pt-6 mb-6">
+          <div className="eyebrow-petrol mb-2">מתודולוגיה</div>
+          <div className="text-[12px] text-ink-soft leading-relaxed max-w-3xl">
+            <p className="mb-2">
+              חמשת הציונים BIG5 מחושבים על פי{' '}
+              <span className="font-medium text-ink">IPIP-50 (Goldberg 1992)</span> —
+              שאלון מאומת מדעית של ה-International Personality Item Pool, שמשמש בעשורים
+              האחרונים במחקרים פסיכולוגיים, ארגוניים, וקליניים ברחבי העולם.
+            </p>
+            <p className="text-ink-mute">
+              ציון התאמה לתפקיד, פירוט החוזקות, הדגלים, דפוסי העבודה, וההתאמה התרבותית —
+              אלו שכבות פרשנות שנבנו מעל הציונים על-פי ספרות מחקרית רלוונטית, ואינן חלק
+              מ-IPIP עצמה.
+            </p>
+          </div>
+        </section>
+
         <footer className="border-t-2 border-ink pt-6 flex items-baseline justify-between text-[11px] tracking-widish uppercase text-ink-mute">
           <span><span dir="ltr">Persona</span> · אבחון אישיותי</span>
           <span className="num" dir="ltr">№ {id?.slice(0, 8).toUpperCase()}</span>

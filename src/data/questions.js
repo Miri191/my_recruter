@@ -1,3 +1,7 @@
+// 50-Item IPIP Big-Five Factor Markers (Goldberg 1992).
+// Source: https://ipip.ori.org — official IPIP-50 inventory in Hebrew translation.
+// Each item: n (1-50), t (Hebrew text), d (dimension: E/A/C/N/O), r (reverse-keyed).
+// Reverse-key flags match the published IPIP-50 scoring key sheet exactly.
 export const questions = [
   { n: 1, t: 'אני "עושה שמח" במסיבות', d: 'E', r: false },
   { n: 2, t: 'לא כל כך אכפת לי מאחרים', d: 'A', r: true },
