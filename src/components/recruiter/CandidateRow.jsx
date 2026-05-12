@@ -22,13 +22,10 @@ export default function CandidateRow({ candidate, index, onDelete }) {
     fit = calculateFit(scores, role).fit;
   }
 
-  const fitTone =
-    fit == null
-      ? 'text-ink-line'
-      : fit >= 75
-        ? 'text-sage'
-        : fit >= 55
-          ? 'text-ochre'
+  const fitColor =
+    fit == null ? 'text-ink-line'
+      : fit >= 75 ? 'text-forest'
+        : fit >= 55 ? 'text-ochre'
           : 'text-oxblood';
 
   const goTo = () => {
@@ -37,22 +34,26 @@ export default function CandidateRow({ candidate, index, onDelete }) {
   };
 
   const n = String(index + 1).padStart(3, '0');
+  const stripeColor = completed ? 'bg-forest' : 'bg-ochre';
 
   return (
     <tr
-      className="border-b border-ink-line hover:bg-paper-dark/40 transition-colors cursor-pointer group"
+      className="border-b border-ink-line/70 hover:bg-paper-dark/40 transition-colors cursor-pointer group"
       onClick={goTo}
     >
-      <td className="py-5 px-4 align-top">
-        <div className="num text-[11px] tracking-widish text-ink-mute pt-1">{n}</div>
+      <td className="py-5 pr-3 align-middle relative">
+        <span className={`absolute right-0 top-2 bottom-2 w-[3px] ${stripeColor} opacity-0 group-hover:opacity-100 transition-opacity`} />
+        <div className="num text-[11px] tracking-widish text-ink-mute pl-2">{n}</div>
       </td>
-      <td className="py-5 px-4 align-top">
-        <div className="flex items-baseline gap-3">
-          <span className="display text-[15px] text-ink leading-none w-7 h-7 border border-ink rounded-full inline-flex items-center justify-center shrink-0">
+      <td className="py-5 px-4 align-middle">
+        <div className="flex items-center gap-3">
+          <span className={`display text-[15px] leading-none w-9 h-9 inline-flex items-center justify-center shrink-0 ${
+            completed ? 'bg-petrol text-paper-light' : 'bg-paper-dark text-ink-soft border border-ink-line'
+          }`}>
             {candidate.name.charAt(0)}
           </span>
           <div className="min-w-0">
-            <div className="display text-[17px] text-ink truncate group-hover:underline-ink">
+            <div className="display text-[17px] text-ink truncate group-hover:underline-petrol">
               {candidate.name}
             </div>
             <div className="text-[12px] text-ink-mute mt-0.5 truncate" dir="ltr">
@@ -68,7 +69,7 @@ export default function CandidateRow({ candidate, index, onDelete }) {
         {completed ? (
           <Badge tone="success">הושלם</Badge>
         ) : (
-          <Badge tone="default">ממתין</Badge>
+          <Badge tone="warning">ממתין</Badge>
         )}
       </td>
       <td className="py-5 px-4 align-middle">
@@ -78,9 +79,9 @@ export default function CandidateRow({ candidate, index, onDelete }) {
       </td>
       <td className="py-5 px-4 align-middle">
         {fit != null ? (
-          <span className={`num text-2xl ${fitTone}`} dir="ltr">
+          <span className={`num text-2xl font-medium ${fitColor}`} dir="ltr">
             {fit}
-            <span className="text-ink-mute text-base">%</span>
+            <span className="text-ink-mute text-base font-normal">%</span>
           </span>
         ) : (
           <span className="num text-ink-line">—</span>
@@ -92,7 +93,7 @@ export default function CandidateRow({ candidate, index, onDelete }) {
             <button
               type="button"
               onClick={() => navigate(`/link/${candidate.id}`)}
-              className="text-[11px] tracking-widish uppercase text-ink-soft hover:text-ink hover:underline-ink"
+              className="text-[11px] tracking-widish uppercase text-petrol hover:underline-petrol font-medium"
               title="קישור"
             >
               קישור
@@ -103,12 +104,12 @@ export default function CandidateRow({ candidate, index, onDelete }) {
             onClick={() => {
               if (window.confirm(`למחוק את ${candidate.name}?`)) onDelete(candidate.id);
             }}
-            className="text-[11px] tracking-widish uppercase text-ink-mute hover:text-oxblood hover:underline-ink"
+            className="text-[11px] tracking-widish uppercase text-ink-mute hover:text-oxblood"
             title="מחיקה"
           >
             מחק
           </button>
-          <span className="text-ink-soft text-lg leading-none">←</span>
+          <span className="text-petrol text-lg leading-none">←</span>
         </div>
       </td>
     </tr>

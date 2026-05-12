@@ -4,6 +4,7 @@ import Sidebar from '../components/layout/Sidebar';
 import PageHeader from '../components/layout/Header';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
+import Card from '../components/ui/Card';
 import { useApp } from '../context/AppContext';
 import { getRole } from '../data/roles';
 
@@ -66,42 +67,42 @@ export default function CandidateLink() {
       <Sidebar />
       <main className="flex-1 px-6 md:px-12 py-8 md:py-14 max-w-4xl mx-auto w-full">
         <PageHeader
-          eyebrow="הזמנה הופקה · גיליון אישי"
+          eyebrow="הזמנה הופקה"
           title="הקישור מוכן לשליחה"
           back
           backTo="/"
         />
 
-        <section className="bg-paper-light border border-ink p-8 md:p-10 mb-8 relative">
-          <div className="absolute top-0 right-0 w-3 h-3 border-r border-t border-ink -translate-x-[5px] -translate-y-[5px]" />
-          <div className="absolute top-0 left-0 w-3 h-3 border-l border-t border-ink translate-x-[5px] -translate-y-[5px]" />
-          <div className="absolute bottom-0 right-0 w-3 h-3 border-r border-b border-ink -translate-x-[5px] translate-y-[5px]" />
-          <div className="absolute bottom-0 left-0 w-3 h-3 border-l border-b border-ink translate-x-[5px] translate-y-[5px]" />
+        <Card variant="elev" accent="petrol" padding="p-7 md:p-9" className="mb-8 animate-fade-up">
+          <div className="flex items-center gap-2 mb-5">
+            <span className="w-2 h-2 rounded-full bg-forest" />
+            <span className="eyebrow text-forest font-semibold">נוצר בהצלחה</span>
+          </div>
 
           <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-3 mb-6">
-            <div>
+            <div className="min-w-0">
               <div className="eyebrow mb-1">מועמד</div>
-              <div className="display text-3xl text-ink">{candidate.name}</div>
+              <div className="display text-3xl text-ink truncate">{candidate.name}</div>
               <div className="text-[13px] text-ink-soft mt-1" dir="ltr">
                 {candidate.email} · {candidate.phone}
               </div>
             </div>
-            <Badge tone="outline" size="lg">{role.name}</Badge>
+            <Badge tone="petrolSolid" size="lg">{role.name}</Badge>
           </div>
 
-          <div className="rule-ink mb-6" />
+          <div className="rule-petrol mb-6" />
 
           <div className="mb-6">
-            <div className="eyebrow mb-3">קישור אישי</div>
+            <div className="eyebrow-petrol mb-3">קישור אישי</div>
             <div className="flex items-stretch gap-3">
               <div
-                className="flex-1 min-w-0 px-4 h-12 flex items-center bg-paper-dark/40 border border-ink-line text-[13px] text-ink truncate font-mono"
+                className="flex-1 min-w-0 px-4 h-12 flex items-center bg-petrol-tint border-2 border-petrol/40 text-[13px] text-petrol-deep truncate font-mono"
                 dir="ltr"
               >
                 {link}
               </div>
               <Button onClick={copyLink} variant={copied ? 'accent' : 'primary'}>
-                {copied ? '✓ הועתק' : 'העתק'}
+                {copied ? '✓ הועתק' : 'העתיקי'}
               </Button>
             </div>
           </div>
@@ -113,28 +114,28 @@ export default function CandidateLink() {
                 href={`https://wa.me/${waPhone}?text=${waMsg}`}
                 target="_blank"
                 rel="noreferrer"
-                className="group flex items-center justify-between gap-3 px-4 h-12 border border-ink-line hover:border-ink hover:bg-paper-dark/40 transition-all"
+                className="group flex items-center justify-between gap-3 px-4 h-12 border border-ink-line bg-paper-light hover:border-forest hover:bg-forest-tint transition-all"
               >
-                <span className="eyebrow group-hover:text-ink">WhatsApp</span>
-                <span className="text-ink-soft group-hover:text-ink">←</span>
+                <span className="eyebrow group-hover:text-forest font-medium">WhatsApp</span>
+                <span className="text-ink-mute group-hover:text-forest">←</span>
               </a>
               <a
                 href={`mailto:${candidate.email}?subject=${emailSubject}&body=${emailBody}`}
-                className="group flex items-center justify-between gap-3 px-4 h-12 border border-ink-line hover:border-ink hover:bg-paper-dark/40 transition-all"
+                className="group flex items-center justify-between gap-3 px-4 h-12 border border-ink-line bg-paper-light hover:border-petrol hover:bg-petrol-tint transition-all"
               >
-                <span className="eyebrow group-hover:text-ink">Email</span>
-                <span className="text-ink-soft group-hover:text-ink">←</span>
+                <span className="eyebrow group-hover:text-petrol font-medium">Email</span>
+                <span className="text-ink-mute group-hover:text-petrol">←</span>
               </a>
               <a
                 href={`sms:${candidate.phone}?body=${waMsg}`}
-                className="group flex items-center justify-between gap-3 px-4 h-12 border border-ink-line hover:border-ink hover:bg-paper-dark/40 transition-all"
+                className="group flex items-center justify-between gap-3 px-4 h-12 border border-ink-line bg-paper-light hover:border-brick hover:bg-brick-tint transition-all"
               >
-                <span className="eyebrow group-hover:text-ink">SMS</span>
-                <span className="text-ink-soft group-hover:text-ink">←</span>
+                <span className="eyebrow group-hover:text-brick font-medium">SMS</span>
+                <span className="text-ink-mute group-hover:text-brick">←</span>
               </a>
             </div>
           </div>
-        </section>
+        </Card>
 
         <div className="flex justify-between items-center">
           <Button variant="secondary" onClick={() => navigate('/')}>
@@ -143,7 +144,7 @@ export default function CandidateLink() {
           <button
             type="button"
             onClick={() => window.open(link, '_blank')}
-            className="eyebrow text-ink-soft hover:text-ink hover:underline-ink"
+            className="eyebrow-petrol hover:underline-petrol font-medium"
           >
             תצוגה מקדימה של השאלון →
           </button>

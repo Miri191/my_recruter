@@ -3,16 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --paper: #F2EBDB;
-  --paper-light: #F8F2E2;
-  --paper-dark: #E8DFC8;
+  --paper: #F4ECDB;
+  --paper-light: #FAF4E5;
+  --paper-dark: #E8DEC5;
   --ink: #1B1714;
   --ink-soft: #3A332C;
   --ink-mute: #7B7264;
   --ink-line: #C9BFA9;
+  --petrol: #1A5868;
+  --petrol-soft: #2C7689;
+  --brick: #B85C38;
+  --forest: #2F5D3F;
+  --ochre: #A8761E;
   --oxblood: #7A2929;
-  --sage: #4F6B47;
-  --ochre: #B07A2A;
 }
 
 @layer base {
@@ -26,10 +29,8 @@
     color: var(--ink);
     background-color: var(--paper);
     background-image:
-      radial-gradient(rgba(27,23,20,0.025) 1px, transparent 1px),
-      radial-gradient(rgba(27,23,20,0.018) 1px, transparent 1px);
-    background-size: 22px 22px, 11px 11px;
-    background-position: 0 0, 11px 11px;
+      radial-gradient(rgba(27,23,20,0.022) 1px, transparent 1px);
+    background-size: 18px 18px;
     line-height: 1.65;
     text-align: right;
     font-feature-settings: 'kern' 1, 'liga' 1;
@@ -42,13 +43,17 @@
     letter-spacing: -0.005em;
   }
   ::selection {
-    background: var(--ink);
-    color: var(--paper);
+    background: var(--petrol);
+    color: var(--paper-light);
   }
   button { font-family: inherit; }
   input, select, textarea {
     font-family: inherit;
     background: transparent;
+  }
+  input::placeholder, textarea::placeholder {
+    color: var(--ink-mute);
+    opacity: 0.7;
   }
   hr { border-color: var(--ink-line); }
   a { color: inherit; }
@@ -63,6 +68,14 @@
     text-transform: uppercase;
     color: var(--ink-mute);
   }
+  .eyebrow-petrol {
+    font-family: 'Heebo', system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--petrol);
+  }
   .rule {
     height: 1px;
     background: var(--ink-line);
@@ -71,6 +84,11 @@
   .rule-ink {
     height: 1px;
     background: var(--ink);
+    width: 100%;
+  }
+  .rule-petrol {
+    height: 2px;
+    background: var(--petrol);
     width: 100%;
   }
   .num {
@@ -97,6 +115,18 @@
     background-position: 0 100%;
     padding-bottom: 1px;
   }
+  .underline-petrol {
+    background-image: linear-gradient(var(--petrol), var(--petrol));
+    background-size: 100% 2px;
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    padding-bottom: 2px;
+  }
+  .card-elev {
+    background: var(--paper-light);
+    border: 1px solid var(--ink-line);
+    box-shadow: 0 1px 0 #C9BFA9, 0 4px 14px -8px rgba(27,23,20,0.08);
+  }
 }
 
 @layer utilities {
@@ -107,13 +137,4 @@
   }
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
-  .grain::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: var(--grain);
-    opacity: 0.5;
-    pointer-events: none;
-    mix-blend-mode: multiply;
-  }
 }

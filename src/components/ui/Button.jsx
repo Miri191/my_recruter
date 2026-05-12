@@ -1,14 +1,16 @@
 const variants = {
   primary:
-    'bg-ink text-paper border border-ink hover:bg-ink-soft hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-ink-sm active:translate-x-0 active:translate-y-0 active:shadow-none',
+    'bg-petrol text-paper-light border border-petrol hover:bg-petrol-soft hover:shadow-ink-sm hover:-translate-x-px hover:-translate-y-px active:translate-x-0 active:translate-y-0 active:shadow-none',
   secondary:
-    'bg-transparent text-ink border border-ink hover:bg-ink hover:text-paper',
+    'bg-paper-light text-ink border border-ink hover:bg-ink hover:text-paper-light',
   ghost:
     'bg-transparent text-ink-soft border border-transparent hover:border-ink-line hover:text-ink',
   accent:
-    'bg-oxblood text-paper border border-oxblood hover:bg-oxblood-soft',
+    'bg-brick text-paper-light border border-brick hover:bg-brick-soft hover:shadow-ink-sm hover:-translate-x-px hover:-translate-y-px',
+  outline:
+    'bg-transparent text-petrol border border-petrol hover:bg-petrol hover:text-paper-light',
   danger:
-    'bg-transparent text-oxblood border border-oxblood hover:bg-oxblood hover:text-paper',
+    'bg-transparent text-oxblood border border-oxblood hover:bg-oxblood hover:text-paper-light',
 };
 
 const sizes = {
@@ -36,10 +38,10 @@ export default function Button({
       disabled={disabled}
       className={`
         inline-flex items-center justify-center gap-2.5 font-medium
-        uppercase tracking-widish
+        uppercase tracking-widish whitespace-nowrap
         transition-all duration-150 ease-out touch-manipulation select-none
         disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-none
-        focus:outline-none focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-ink
+        focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-petrol
         ${variants[variant]}
         ${sizes[size]}
         ${fullWidth ? 'w-full' : ''}

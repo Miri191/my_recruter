@@ -5,19 +5,30 @@ export default function Card({
   as: Tag = 'div',
   hover = false,
   variant = 'default',
+  accent,
   ...props
 }) {
   const variants = {
     default: 'bg-paper-light border border-ink-line',
+    elev: 'card-elev',
     ink: 'bg-paper-light border border-ink',
     plain: 'bg-transparent border border-ink-line',
+  };
+  const accents = {
+    petrol: 'border-r-[3px] border-r-petrol',
+    brick: 'border-r-[3px] border-r-brick',
+    forest: 'border-r-[3px] border-r-forest',
+    ochre: 'border-r-[3px] border-r-ochre',
+    oxblood: 'border-r-[3px] border-r-oxblood',
+    ink: 'border-r-[3px] border-r-ink',
   };
   return (
     <Tag
       className={`
         ${variants[variant]}
+        ${accent ? accents[accent] : ''}
         ${padding}
-        ${hover ? 'transition-all duration-200 hover:border-ink hover:shadow-ink-sm hover:translate-x-[-1px] hover:translate-y-[-1px] cursor-pointer' : ''}
+        ${hover ? 'transition-all duration-200 hover:border-ink hover:shadow-ink-sm hover:-translate-x-px hover:-translate-y-px cursor-pointer' : ''}
         ${className}
       `}
       {...props}

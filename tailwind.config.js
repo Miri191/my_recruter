@@ -11,9 +11,9 @@ export default {
       },
       colors: {
         paper: {
-          DEFAULT: '#F2EBDB',
-          light: '#F8F2E2',
-          dark: '#E8DFC8',
+          DEFAULT: '#F4ECDB',
+          light: '#FAF4E5',
+          dark: '#E8DEC5',
         },
         ink: {
           DEFAULT: '#1B1714',
@@ -21,20 +21,37 @@ export default {
           mute: '#7B7264',
           line: '#C9BFA9',
         },
+        petrol: {
+          DEFAULT: '#1A5868',
+          soft: '#2C7689',
+          deep: '#0F3D49',
+          ghost: '#DDE9ED',
+          tint: '#EEF5F7',
+        },
+        brick: {
+          DEFAULT: '#B85C38',
+          soft: '#D17B58',
+          deep: '#923F1F',
+          ghost: '#F4E3D9',
+          tint: '#F9EFE7',
+        },
+        forest: {
+          DEFAULT: '#2F5D3F',
+          soft: '#4A7A5A',
+          ghost: '#DCE7DF',
+          tint: '#EBF2EC',
+        },
+        ochre: {
+          DEFAULT: '#A8761E',
+          soft: '#C99244',
+          ghost: '#F2E5C9',
+          tint: '#F8EFD8',
+        },
         oxblood: {
           DEFAULT: '#7A2929',
           soft: '#9C3838',
-          ghost: '#F1E5E5',
-        },
-        sage: {
-          DEFAULT: '#4F6B47',
-          soft: '#6F8765',
-          ghost: '#E4EBDF',
-        },
-        ochre: {
-          DEFAULT: '#B07A2A',
-          soft: '#C99244',
-          ghost: '#F2E8D2',
+          ghost: '#F1E0E0',
+          tint: '#F8ECEC',
         },
       },
       letterSpacing: {
@@ -46,15 +63,17 @@ export default {
         none: '0',
         DEFAULT: '2px',
         sm: '1px',
+        md: '4px',
+        lg: '6px',
       },
       boxShadow: {
         ink: '4px 4px 0 0 #1B1714',
         'ink-sm': '2px 2px 0 0 #1B1714',
+        'ink-xs': '1px 1px 0 0 #1B1714',
+        petrol: '4px 4px 0 0 #1A5868',
+        'petrol-sm': '2px 2px 0 0 #1A5868',
         soft: '0 1px 0 0 #C9BFA9',
-      },
-      backgroundImage: {
-        grain:
-          "url(\"data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.18 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
+        card: '0 1px 0 #C9BFA9, 0 4px 12px -6px rgba(27,23,20,0.08)',
       },
       keyframes: {
         'fade-up': {
@@ -69,11 +88,16 @@ export default {
           '0%': { transform: 'scaleX(0)' },
           '100%': { transform: 'scaleX(1)' },
         },
+        'scale-in': {
+          '0%': { opacity: 0, transform: 'scale(0.95)' },
+          '100%': { opacity: 1, transform: 'scale(1)' },
+        },
       },
       animation: {
         'fade-up': 'fade-up 0.5s cubic-bezier(0.2,0.7,0.2,1) both',
         'fade-in': 'fade-in 0.4s ease-out both',
         'rule-in': 'rule-in 0.6s cubic-bezier(0.4,0,0.2,1) both',
+        'scale-in': 'scale-in 0.3s cubic-bezier(0.2,0.7,0.2,1) both',
       },
     },
   },

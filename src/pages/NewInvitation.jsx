@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/layout/Sidebar';
 import PageHeader from '../components/layout/Header';
 import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
 import RoleCard from '../components/recruiter/RoleCard';
 import { roles } from '../data/roles';
 import { useApp } from '../context/AppContext';
@@ -59,14 +60,14 @@ export default function NewInvitation() {
   };
 
   const inputBase =
-    'w-full h-11 px-0 bg-transparent border-b border-ink-line text-[15px] focus:outline-none focus:border-ink transition-colors placeholder:text-ink-mute';
+    'w-full h-11 px-3 bg-paper-light border-2 border-ink-line text-[15px] focus:outline-none focus:border-petrol transition-colors';
 
   return (
     <div className="flex min-h-screen">
       <Sidebar />
       <main className="flex-1 px-6 md:px-12 py-8 md:py-14 max-w-4xl mx-auto w-full">
         <PageHeader
-          eyebrow="פרק III · הזמנה חדשה"
+          eyebrow="הזמנה חדשה"
           title="מועמד חדש"
           subtitle="ראשית — בחירת תפקיד. אחר־כך פרטי המועמד. בסוף — נפיק קישור אישי לשליחה."
           back
@@ -74,9 +75,9 @@ export default function NewInvitation() {
         />
 
         <form onSubmit={onSubmit}>
-          <section className="mb-12">
+          <Card variant="elev" padding="p-7 md:p-8" className="mb-6">
             <div className="flex items-baseline gap-4 mb-5">
-              <span className="num text-[11px] tracking-widish text-ink-mute">01</span>
+              <span className="num text-[11px] tracking-widish text-petrol font-semibold">01</span>
               <h2 className="display text-2xl text-ink">בחירת תפקיד</h2>
               <div className="flex-1 rule h-px" />
             </div>
@@ -95,15 +96,15 @@ export default function NewInvitation() {
               ))}
             </div>
             {errors.role && <p className="text-[12px] text-oxblood mt-3">{errors.role}</p>}
-          </section>
+          </Card>
 
-          <section className="mb-12">
+          <Card variant="elev" padding="p-7 md:p-8" className="mb-6">
             <div className="flex items-baseline gap-4 mb-5">
-              <span className="num text-[11px] tracking-widish text-ink-mute">02</span>
+              <span className="num text-[11px] tracking-widish text-petrol font-semibold">02</span>
               <h2 className="display text-2xl text-ink">פרטי המועמד</h2>
               <div className="flex-1 rule h-px" />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
               <div className="md:col-span-2">
                 <Field label="שם מלא" error={errors.name}>
                   <input
@@ -136,10 +137,9 @@ export default function NewInvitation() {
                 />
               </Field>
             </div>
-          </section>
+          </Card>
 
-          <div className="rule-ink mb-6" />
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-4 pt-2">
             <button
               type="button"
               onClick={() => navigate(-1)}
@@ -148,7 +148,7 @@ export default function NewInvitation() {
               ביטול
             </button>
             <Button type="submit" size="lg" disabled={submitting}>
-              הפק קישור ←
+              הפיקי קישור ←
             </Button>
           </div>
         </form>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/layout/Sidebar';
 import PageHeader from '../components/layout/Header';
 import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
 import EmptyState from '../components/ui/EmptyState';
 import CandidateRow from '../components/recruiter/CandidateRow';
 import { useApp } from '../context/AppContext';
@@ -11,12 +12,22 @@ import { questions } from '../data/questions';
 import { calculateScores } from '../lib/scoring';
 import { calculateFit } from '../lib/fit';
 
-function StatBlock({ eyebrow, value, suffix, note }) {
+function StatBlock({ eyebrow, value, suffix, note, accent }) {
+  const accentMap = {
+    petrol: { eyebrowCol: 'text-petrol', numCol: 'text-ink', dot: 'bg-petrol' },
+    ochre: { eyebrowCol: 'text-ochre', numCol: 'text-ink', dot: 'bg-ochre' },
+    forest: { eyebrowCol: 'text-forest', numCol: 'text-ink', dot: 'bg-forest' },
+    brick: { eyebrowCol: 'text-brick', numCol: 'text-ink', dot: 'bg-brick' },
+  };
+  const a = accentMap[accent] || accentMap.petrol;
   return (
-    <div className="border-t border-ink pt-4 pb-2 px-1">
-      <div className="eyebrow mb-3">{eyebrow}</div>
+    <Card variant="elev" accent={accent} padding="p-5">
+      <div className="flex items-center gap-2 mb-3">
+        <span className={`w-1.5 h-1.5 rounded-full ${a.dot}`} />
+        <span className={`eyebrow ${a.eyebrowCol} font-semibold`}>{eyebrow}</span>
+      </div>
       <div className="flex items-baseline gap-1">
-        <span className="display text-5xl md:text-6xl text-ink leading-none" dir="ltr">
+        <span className={`display text-5xl md:text-[56px] leading-none ${a.numCol}`} dir="ltr">
           {value}
         </span>
         {suffix && (
@@ -24,7 +35,7 @@ function StatBlock({ eyebrow, value, suffix, note }) {
         )}
       </div>
       {note && <div className="text-[12px] text-ink-mute mt-3">{note}</div>}
-    </div>
+    </Card>
   );
 }
 
@@ -83,16 +94,17 @@ export default function Dashboard() {
           subtitle="כל המועמדים שהוזמנו לשאלון, סטטוס מילוי וציון התאמה משוקלל לתפקיד."
           action={
             <Button size="lg" onClick={() => navigate('/new')}>
-              מועמד חדש +
+              + מועמד חדש
             </Button>
           }
         />
 
-        <section className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10 mb-12">
-          <StatBlock eyebrow="סך הכל" value={stats.total} note="מועמדים בפנקס" />
-          <StatBlock eyebrow="ממתינים" value={stats.pending} note="טרם הגישו תשובות" />
-          <StatBlock eyebrow="הושלמו" value={stats.completed} note="זמינים לקריאה" />
+        <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-12">
+          <StatBlock accent="petrol" eyebrow="סך הכל" value={stats.total} note="מועמדים בפנקס" />
+          <StatBlock accent="ochre" eyebrow="ממתינים" value={stats.pending} note="טרם הגישו תשובות" />
+          <StatBlock accent="forest" eyebrow="הושלמו" value={stats.completed} note="זמינים לקריאה" />
           <StatBlock
+            accent="brick"
             eyebrow="ממוצע התאמה"
             value={stats.avgFit || '—'}
             suffix={stats.avgFit ? '%' : ''}
@@ -103,15 +115,15 @@ export default function Dashboard() {
         <section className="mb-6">
           <div className="flex items-baseline justify-between mb-4">
             <div>
-              <div className="eyebrow mb-2">פרק II</div>
-              <h2 className="display text-2xl text-ink">רשימה מלאה</h2>
+              <div className="eyebrow-petrol mb-2">פרק II · רשימה</div>
+              <h2 className="display text-2xl text-ink">כל המועמדים</h2>
             </div>
             <div className="text-[12px] text-ink-mute">
-              <span className="num">{filtered.length}</span> מתוך{' '}
+              <span className="num text-ink font-medium">{filtered.length}</span> מתוך{' '}
               <span className="num">{candidates.length}</span>
             </div>
           </div>
-          <div className="rule-ink mb-5" />
+          <div className="rule-petrol mb-5" />
 
           <div className="flex flex-col md:flex-row gap-3 md:items-center mb-6">
             <div className="relative flex-1">
@@ -121,13 +133,13 @@ export default function Dashboard() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="שם · אימייל · טלפון"
-                className="w-full h-11 pr-16 pl-3 bg-transparent border-b border-ink-line text-[14px] focus:outline-none focus:border-ink transition-colors placeholder:text-ink-mute"
+                className="w-full h-11 pr-16 pl-3 bg-transparent border-b-2 border-ink-line text-[14px] focus:outline-none focus:border-petrol transition-colors"
               />
             </div>
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="h-11 px-3 bg-transparent border-b border-ink-line text-[13px] focus:outline-none focus:border-ink transition-colors cursor-pointer"
+              className="h-11 px-3 bg-paper-light border border-ink-line text-[13px] focus:outline-none focus:border-petrol transition-colors cursor-pointer"
             >
               <option value="all">כל התפקידים</option>
               {roles.map((r) => (
@@ -137,7 +149,7 @@ export default function Dashboard() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="h-11 px-3 bg-transparent border-b border-ink-line text-[13px] focus:outline-none focus:border-ink transition-colors cursor-pointer"
+              className="h-11 px-3 bg-paper-light border border-ink-line text-[13px] focus:outline-none focus:border-petrol transition-colors cursor-pointer"
             >
               <option value="all">כל הסטטוסים</option>
               <option value="pending">ממתין</option>
@@ -161,26 +173,28 @@ export default function Dashboard() {
             }
           />
         ) : (
-          <div className="overflow-x-auto -mx-4 px-4">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b-2 border-ink">
-                  <th className="py-3 px-4 text-right eyebrow">№</th>
-                  <th className="py-3 px-4 text-right eyebrow">מועמד</th>
-                  <th className="py-3 px-4 text-right eyebrow">תפקיד</th>
-                  <th className="py-3 px-4 text-right eyebrow">סטטוס</th>
-                  <th className="py-3 px-4 text-right eyebrow">תאריך</th>
-                  <th className="py-3 px-4 text-right eyebrow">התאמה</th>
-                  <th className="py-3 px-4 text-left eyebrow">פעולות</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((c, i) => (
-                  <CandidateRow key={c.id} candidate={c} index={i} onDelete={deleteCandidate} />
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Card variant="elev" padding="p-0" className="overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-paper-dark/40">
+                  <tr className="border-b-2 border-ink">
+                    <th className="py-3 pr-3 pl-2 text-right eyebrow">№</th>
+                    <th className="py-3 px-4 text-right eyebrow">מועמד</th>
+                    <th className="py-3 px-4 text-right eyebrow">תפקיד</th>
+                    <th className="py-3 px-4 text-right eyebrow">סטטוס</th>
+                    <th className="py-3 px-4 text-right eyebrow">תאריך</th>
+                    <th className="py-3 px-4 text-right eyebrow">התאמה</th>
+                    <th className="py-3 px-4 text-left eyebrow">פעולות</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((c, i) => (
+                    <CandidateRow key={c.id} candidate={c} index={i} onDelete={deleteCandidate} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
         )}
       </main>
     </div>

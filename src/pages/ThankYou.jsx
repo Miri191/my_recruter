@@ -13,18 +13,21 @@ export default function ThankYou() {
     <MobileFrame>
       <div className="min-h-screen md:min-h-[760px] flex flex-col p-7 md:p-9 bg-paper-light">
         <div className="flex items-baseline justify-between mb-12">
-          <div className="eyebrow">פנקס אישיות · סיום</div>
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-forest" />
+            <span className="eyebrow text-forest font-semibold">פנקס · סיום</span>
+          </div>
           <div className="eyebrow num">Fin.</div>
         </div>
 
         <div className="flex-1 flex flex-col">
           <div className="mb-8">
-            <div className="eyebrow mb-3">פיסה</div>
-            <div className="rule-ink mb-6" />
+            <div className="eyebrow-petrol mb-3">פיסה</div>
+            <div className="rule-petrol mb-6" />
             <h1 className="display text-[52px] md:text-[64px] text-ink leading-[0.95] text-balance">
               תודה{firstName ? `,` : '.'}<br/>
               {firstName && (
-                <span className="text-ink-soft">{firstName}.</span>
+                <span className="text-petrol-deep">{firstName}.</span>
               )}
             </h1>
           </div>
@@ -39,7 +42,7 @@ export default function ThankYou() {
             <div className="flex items-baseline justify-between">
               <div>
                 <div className="eyebrow mb-1.5">מספר אסמכתא</div>
-                <div className="num display text-2xl text-ink tracking-widish" dir="ltr">
+                <div className="num display text-2xl text-petrol-deep tracking-widish font-medium" dir="ltr">
                   {refNumber}
                 </div>
               </div>
@@ -50,7 +53,7 @@ export default function ThankYou() {
                 </div>
               </div>
             </div>
-            <div className="rule-ink mt-6" />
+            <div className="rule-petrol mt-6" />
             <div className="eyebrow text-center mt-4 text-ink-mute">
               ניתן לסגור את החלון
             </div>

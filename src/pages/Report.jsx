@@ -12,6 +12,7 @@ import Sidebar from '../components/layout/Sidebar';
 import PageHeader from '../components/layout/Header';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
+import Card from '../components/ui/Card';
 import ScoreBar from '../components/recruiter/ScoreBar';
 import { useApp } from '../context/AppContext';
 import { getRole } from '../data/roles';
@@ -23,18 +24,22 @@ import { generateInsights } from '../lib/insights';
 
 function FitDisplay({ fit }) {
   const tone =
-    fit >= 75 ? 'text-sage' : fit >= 55 ? 'text-ochre' : 'text-oxblood';
+    fit >= 75 ? { color: 'text-forest', bg: 'bg-forest-tint', border: 'border-forest', accent: 'forest' }
+      : fit >= 55 ? { color: 'text-ochre', bg: 'bg-ochre-tint', border: 'border-ochre', accent: 'ochre' }
+        : { color: 'text-oxblood', bg: 'bg-oxblood-tint', border: 'border-oxblood', accent: 'oxblood' };
+
   return (
-    <div className="text-center">
+    <Card variant="elev" accent={tone.accent} padding="p-8" className="text-center">
       <div className="eyebrow mb-3">ציון התאמה כולל</div>
-      <div className="rule-ink mb-6" />
-      <div className={`display ${tone}`} dir="ltr">
-        <span className="text-[120px] md:text-[160px] leading-[0.9]">{fit}</span>
+      <div className="rule-petrol mx-auto w-16 mb-5" />
+      <div className={`display ${tone.color}`} dir="ltr">
+        <span className="text-[120px] md:text-[150px] leading-[0.9] font-medium">{fit}</span>
         <span className="text-5xl text-ink-mute">%</span>
       </div>
-      <div className="rule-ink mt-6" />
-      <div className="eyebrow mt-3">{fitLabel(fit)}</div>
-    </div>
+      <div className={`inline-block mt-4 px-3 py-1 border ${tone.border} ${tone.bg} ${tone.color} text-[12px] tracking-widish uppercase font-medium`}>
+        {fitLabel(fit)}
+      </div>
+    </Card>
   );
 }
 
@@ -80,15 +85,15 @@ export default function Report() {
         <Sidebar />
         <main className="flex-1 px-6 md:px-12 py-14 max-w-3xl mx-auto w-full">
           <PageHeader title={candidate.name} subtitle="ממתין לסיום השאלון" back backTo="/" />
-          <div className="bg-paper-light border border-ink-line p-12 text-center">
-            <div className="eyebrow mb-3">סטטוס</div>
+          <Card variant="elev" accent="ochre" padding="p-12" className="text-center">
+            <Badge tone="warning" size="lg" className="mb-4">ממתין</Badge>
             <h3 className="display text-2xl text-ink mb-2">המועמד עוד לא סיים</h3>
             <div className="rule mx-auto w-10 mb-4" />
             <p className="text-sm text-ink-soft mb-6">
               הדוח יתעדכן אוטומטית כשהמועמד יסיים את השאלון
             </p>
-            <Button onClick={() => navigate(`/link/${id}`)}>פתח קישור ←</Button>
-          </div>
+            <Button onClick={() => navigate(`/link/${id}`)}>פתחי קישור ←</Button>
+          </Card>
         </main>
       </div>
     );
@@ -108,7 +113,7 @@ export default function Report() {
       <Sidebar />
       <main className="flex-1 px-6 md:px-12 py-8 md:py-14 max-w-6xl mx-auto w-full">
         <PageHeader
-          eyebrow={`גליון אישי · ${completedDate}`}
+          eyebrow={`גליון אישי · הוגש ב־${completedDate}`}
           title={candidate.name}
           subtitle={
             <span className="flex items-center gap-4 flex-wrap text-sm text-ink-soft">
@@ -116,7 +121,7 @@ export default function Report() {
               <span className="text-ink-line">·</span>
               <span dir="ltr">{candidate.phone}</span>
               <span className="text-ink-line">·</span>
-              <span>{role.name}</span>
+              <Badge tone="petrol" size="md">{role.name}</Badge>
             </span>
           }
           back
@@ -134,30 +139,31 @@ export default function Report() {
           }
         />
 
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-16 items-center">
-          <div className="lg:col-span-5">
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12 items-stretch">
+          <div className="lg:col-span-5 flex flex-col">
             <FitDisplay fit={fit} />
-            <p className="text-[13px] text-ink-mute mt-6 text-center max-w-xs mx-auto leading-relaxed">
-              ציון משוקלל לפי חשיבות כל ממד אישיות לתפקיד <span className="text-ink underline-ink">{role.name}</span>.
+            <p className="text-[13px] text-ink-mute mt-4 text-center max-w-xs mx-auto leading-relaxed">
+              ציון משוקלל לפי חשיבות כל ממד אישיות לתפקיד{' '}
+              <span className="text-petrol underline-petrol font-medium">{role.name}</span>.
             </p>
           </div>
 
-          <div className="lg:col-span-7">
+          <Card variant="elev" padding="p-6" className="lg:col-span-7">
             <div className="flex items-baseline justify-between mb-3">
               <div>
-                <div className="eyebrow mb-1">פרק I</div>
+                <div className="eyebrow-petrol mb-1">פרק I</div>
                 <h2 className="display text-2xl text-ink">פרופיל אישיות</h2>
               </div>
               <div className="flex items-center gap-4 text-[11px] uppercase tracking-widish">
-                <span className="flex items-center gap-2 text-ink">
-                  <span className="w-4 h-px bg-ink" /> המועמד
+                <span className="flex items-center gap-2 text-petrol font-medium">
+                  <span className="w-4 h-[3px] bg-petrol" /> המועמד
                 </span>
-                <span className="flex items-center gap-2 text-oxblood">
-                  <span className="w-4 border-t border-dashed border-oxblood" /> אידיאלי
+                <span className="flex items-center gap-2 text-brick font-medium">
+                  <span className="w-4 border-t-[3px] border-dashed border-brick" /> אידיאלי
                 </span>
               </div>
             </div>
-            <div className="rule-ink mb-2" />
+            <div className="rule-petrol mb-2" />
             <div className="h-80 -mx-4">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={radarData} outerRadius="72%">
@@ -176,47 +182,51 @@ export default function Report() {
                   <Radar
                     name="המועמד"
                     dataKey="candidate"
-                    stroke="#1B1714"
-                    fill="#1B1714"
-                    fillOpacity={0.12}
-                    strokeWidth={1.5}
+                    stroke="#1A5868"
+                    fill="#1A5868"
+                    fillOpacity={0.22}
+                    strokeWidth={2}
                   />
                   <Radar
                     name="אידיאלי"
                     dataKey="ideal"
-                    stroke="#7A2929"
-                    fill="#7A2929"
-                    fillOpacity={0.05}
-                    strokeWidth={1.5}
-                    strokeDasharray="4 3"
+                    stroke="#B85C38"
+                    fill="#B85C38"
+                    fillOpacity={0.08}
+                    strokeWidth={2}
+                    strokeDasharray="5 3"
                   />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
-          </div>
+          </Card>
         </section>
 
-        <section className="mb-16">
+        <Card variant="elev" padding="p-7 md:p-8" className="mb-12">
           <div className="flex items-baseline gap-4 mb-5">
-            <span className="num text-[11px] tracking-widish text-ink-mute">II</span>
+            <span className="num text-[11px] tracking-widish text-petrol font-medium">II</span>
             <h2 className="display text-2xl text-ink">פירוט לפי ממדים</h2>
-            <div className="flex-1 rule-ink h-px" />
+            <div className="flex-1 rule h-px" />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0">
             {dimensionOrder.map((d) => (
               <ScoreBar key={d} dim={d} score={scores[d]} ideal={role.ideal[d]} />
             ))}
           </div>
-          <p className="text-[12px] text-ink-mute mt-5 leading-relaxed max-w-md">
-            הקו האנכי האדום מסמן את הציון האידיאלי לתפקיד. הקו השחור — ציון המועמד.
+          <p className="text-[12px] text-ink-mute mt-5 leading-relaxed max-w-lg">
+            <span className="inline-block w-3 h-[2px] bg-ink align-middle mx-1" /> מסמן את הציון האידיאלי לתפקיד.
+            הצבע של הפס מסמן את גובה ההתאמה: ירוק — תואם, חמרה — פער קל, אדום — פער גדול.
           </p>
-        </section>
+        </Card>
 
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-12">
-          <div>
-            <div className="eyebrow mb-2">פרק III · א</div>
-            <h3 className="display text-2xl text-ink mb-3">חוזקות</h3>
-            <div className="rule-ink mb-5" />
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-12">
+          <Card variant="elev" accent="forest" padding="p-6">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-2 h-2 rounded-full bg-forest" />
+              <div className="eyebrow text-forest font-semibold">פרק III · א</div>
+            </div>
+            <h3 className="display text-2xl text-ink mb-2">חוזקות</h3>
+            <div className="rule mb-5" />
             {insights.strengths.length === 0 ? (
               <p className="text-[14px] text-ink-soft leading-relaxed">
                 אין ממד שבולט במיוחד מעל הציפיות לתפקיד.
@@ -224,22 +234,27 @@ export default function Report() {
             ) : (
               <ul className="space-y-5">
                 {insights.strengths.map((s) => (
-                  <li key={s.dim} className="border-r-2 border-sage pr-4">
-                    <div className="flex items-baseline justify-between mb-1">
+                  <li key={s.dim}>
+                    <div className="flex items-baseline justify-between mb-1.5">
                       <span className="display text-[17px] text-ink">{s.name}</span>
-                      <span className="num text-sage text-sm" dir="ltr">{s.score}/100</span>
+                      <Badge tone="forest" size="sm">
+                        <span className="num" dir="ltr">{s.score}/100</span>
+                      </Badge>
                     </div>
                     <p className="text-[13px] text-ink-soft leading-relaxed">{s.copy}</p>
                   </li>
                 ))}
               </ul>
             )}
-          </div>
+          </Card>
 
-          <div>
-            <div className="eyebrow mb-2">פרק III · ב</div>
-            <h3 className="display text-2xl text-ink mb-3">נקודות לתשומת לב</h3>
-            <div className="rule-ink mb-5" />
+          <Card variant="elev" accent="ochre" padding="p-6">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-2 h-2 rounded-full bg-ochre" />
+              <div className="eyebrow text-ochre font-semibold">פרק III · ב</div>
+            </div>
+            <h3 className="display text-2xl text-ink mb-2">נקודות לתשומת לב</h3>
+            <div className="rule mb-5" />
             {insights.concerns.length === 0 ? (
               <p className="text-[14px] text-ink-soft leading-relaxed">
                 לא זוהו פערים משמעותיים מול דרישות התפקיד.
@@ -247,24 +262,27 @@ export default function Report() {
             ) : (
               <ul className="space-y-5">
                 {insights.concerns.map((c) => (
-                  <li key={c.dim} className="border-r-2 border-oxblood pr-4">
-                    <div className="flex items-baseline justify-between mb-1">
+                  <li key={c.dim}>
+                    <div className="flex items-baseline justify-between mb-1.5">
                       <span className="display text-[17px] text-ink">{c.name}</span>
-                      <span className="num text-oxblood text-sm" dir="ltr">
-                        {c.score} / {c.ideal}
-                      </span>
+                      <Badge tone="ochre" size="sm">
+                        <span className="num" dir="ltr">{c.score} / {c.ideal}</span>
+                      </Badge>
                     </div>
                     <p className="text-[13px] text-ink-soft leading-relaxed">{c.copy}</p>
                   </li>
                 ))}
               </ul>
             )}
-          </div>
+          </Card>
 
-          <div>
-            <div className="eyebrow mb-2">פרק III · ג</div>
-            <h3 className="display text-2xl text-ink mb-3">שאלות לראיון</h3>
-            <div className="rule-ink mb-5" />
+          <Card variant="elev" accent="petrol" padding="p-6">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-2 h-2 rounded-full bg-petrol" />
+              <div className="eyebrow-petrol">פרק III · ג</div>
+            </div>
+            <h3 className="display text-2xl text-ink mb-2">שאלות לראיון</h3>
+            <div className="rule mb-5" />
             {insights.interviewQuestions.length === 0 ? (
               <p className="text-[14px] text-ink-soft leading-relaxed">
                 אין צורך בשאלות מיקוד מיוחדות.
@@ -273,18 +291,18 @@ export default function Report() {
               <ol className="space-y-5">
                 {insights.interviewQuestions.map((iq, i) => (
                   <li key={i} className="flex gap-3">
-                    <span className="num text-[11px] tracking-widish text-ink-mute pt-1 w-6 shrink-0" dir="ltr">
+                    <span className="num text-[12px] tracking-widish text-petrol pt-1 w-6 shrink-0 font-semibold" dir="ltr">
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     <div>
-                      <div className="eyebrow text-ink-mute mb-1.5">{iq.name}</div>
+                      <Badge tone="petrol" size="sm" className="mb-2">{iq.name}</Badge>
                       <p className="text-[14px] text-ink-soft leading-relaxed">{iq.q}</p>
                     </div>
                   </li>
                 ))}
               </ol>
             )}
-          </div>
+          </Card>
         </section>
 
         <footer className="border-t-2 border-ink pt-6 flex items-baseline justify-between text-[11px] tracking-widish uppercase text-ink-mute">
