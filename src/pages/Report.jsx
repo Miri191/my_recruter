@@ -368,7 +368,7 @@ export default function Report() {
         </section>
 
         <footer className="border-t-2 border-ink pt-6 flex items-baseline justify-between text-[11px] tracking-widish uppercase text-ink-mute">
-          <span>אורקל · אבחון אישיות</span>
+          <span><span dir="ltr">Persona</span> · אבחון אישיות</span>
           <span className="num" dir="ltr">№ {id?.slice(0, 8).toUpperCase()}</span>
           <span>BIG5 · IPIP 50</span>
         </footer>

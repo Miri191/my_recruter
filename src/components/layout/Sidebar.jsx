@@ -13,7 +13,7 @@ export default function Sidebar() {
           <span className="w-1.5 h-1.5 rounded-full bg-petrol" />
           <div className="eyebrow-petrol">Recruiter — Edition 01</div>
         </div>
-        <div className="display text-3xl text-ink leading-none">אורקל</div>
+        <div className="display text-3xl text-ink leading-none" dir="ltr">Persona</div>
         <div className="text-[13px] text-ink-soft mt-2 leading-snug">
           פנקס אבחון אישיותי לקראת ראיון
         </div>
