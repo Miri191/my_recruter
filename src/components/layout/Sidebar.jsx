@@ -3,7 +3,7 @@ import { LogOut } from 'lucide-react';
 import { lock } from '../../lib/auth';
 
 const navItems = [
-  { to: '/', label: 'דשבורד', n: '01', end: true },
+  { to: '/dashboard', label: 'דשבורד', n: '01', end: true },
   { to: '/new', label: 'מועמד חדש', n: '02' },
   { to: '/roles', label: 'ניהול תפקידים', n: '03' },
 ];

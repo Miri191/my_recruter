@@ -23,7 +23,7 @@ export default function CandidateLink() {
         <Sidebar />
         <main className="flex-1 px-6 py-14 text-center">
           <p className="text-ink-soft">לא נמצא מועמד</p>
-          <Button className="mt-4" onClick={() => navigate('/')}>חזרה לדשבורד</Button>
+          <Button className="mt-4" onClick={() => navigate('/dashboard')}>חזרה לדשבורד</Button>
         </main>
       </div>
     );
@@ -70,7 +70,7 @@ export default function CandidateLink() {
           eyebrow="הזמנה הופקה"
           title="הקישור מוכן לשליחה"
           back
-          backTo="/"
+          backTo="/dashboard"
         />
 
         <Card variant="elev" accent="petrol" padding="p-7 md:p-9" className="mb-8 animate-fade-up">
@@ -138,7 +138,7 @@ export default function CandidateLink() {
         </Card>
 
         <div className="flex justify-between items-center">
-          <Button variant="secondary" onClick={() => navigate('/')}>
+          <Button variant="secondary" onClick={() => navigate('/dashboard')}>
             ← חזרה לדשבורד
           </Button>
           <button

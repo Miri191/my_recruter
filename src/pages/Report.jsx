@@ -206,7 +206,7 @@ export default function Report() {
         <Sidebar />
         <main className="flex-1 px-6 py-14 text-center">
           <p className="text-ink-soft">לא נמצא מועמד</p>
-          <Button className="mt-4" onClick={() => navigate('/')}>חזרה</Button>
+          <Button className="mt-4" onClick={() => navigate('/dashboard')}>חזרה</Button>
         </main>
       </div>
     );
@@ -217,7 +217,7 @@ export default function Report() {
       <div className="flex min-h-screen">
         <Sidebar />
         <main className="flex-1 px-6 md:px-12 py-14 max-w-3xl mx-auto w-full">
-          <PageHeader title={candidate.name} subtitle="ממתין לסיום השאלון" back backTo="/" />
+          <PageHeader title={candidate.name} subtitle="ממתין לסיום השאלון" back backTo="/dashboard" />
           <Card variant="elev" accent="ochre" padding="p-12" className="text-center">
             <Badge tone="warning" size="lg" className="mb-4">ממתין</Badge>
             <h3 className="display text-2xl text-ink mb-2">המועמד עוד לא סיים</h3>
@@ -258,7 +258,7 @@ export default function Report() {
             </span>
           }
           back
-          backTo="/"
+          backTo="/dashboard"
           action={
             <div className="flex items-center gap-2 no-print">
               <button

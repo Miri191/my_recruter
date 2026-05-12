@@ -70,7 +70,7 @@ export default function NewInvitation() {
           title="מועמד חדש"
           subtitle="ראשית — בחירת תפקיד. אחר־כך פרטי המועמד. בסוף — נפיק קישור אישי לשליחה."
           back
-          backTo="/"
+          backTo="/dashboard"
         />
 
         <form onSubmit={onSubmit}>
