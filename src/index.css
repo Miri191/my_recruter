@@ -76,17 +76,14 @@
   .rule {
     height: 1px;
     background: var(--ink-line);
-    width: 100%;
   }
   .rule-ink {
     height: 1px;
     background: var(--ink);
-    width: 100%;
   }
   .rule-petrol {
     height: 2px;
     background: var(--petrol);
-    width: 100%;
   }
   .num {
     font-family: 'Frank Ruhl Libre', Georgia, serif;
