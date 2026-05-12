@@ -1,41 +1,25 @@
-import { Handshake, Compass, Code2, Palette, Headphones, Users } from 'lucide-react';
-import { CheckCircle2 } from 'lucide-react';
-
-const iconMap = {
-  Handshake,
-  Compass,
-  Code2,
-  Palette,
-  Headphones,
-  Users,
-};
-
-export default function RoleCard({ role, selected, onClick }) {
-  const Icon = iconMap[role.icon] || Users;
+export default function RoleCard({ role, selected, onClick, index }) {
+  const n = String(index + 1).padStart(2, '0');
   return (
     <button
       type="button"
       onClick={onClick}
       className={`
-        relative w-full text-right p-5 rounded-xl border-2 transition-all duration-200
+        group relative w-full text-right p-5 border transition-all duration-200
         ${selected
-          ? 'border-primary-500 bg-primary-50 shadow-lift'
-          : 'border-gray-200 bg-white hover:border-primary-300 hover:bg-primary-50/30'}
+          ? 'border-ink bg-paper-light shadow-ink-sm -translate-x-px -translate-y-px'
+          : 'border-ink-line bg-transparent hover:border-ink hover:bg-paper-light/60'}
       `}
     >
-      <div className="flex items-start gap-3">
-        <div className={`w-11 h-11 rounded-lg flex items-center justify-center shrink-0 transition-colors
-          ${selected ? 'bg-brand-gradient text-white' : 'bg-gray-100 text-gray-600'}`}>
-          <Icon size={22} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="font-semibold text-gray-900">{role.name}</div>
-          <div className="text-xs text-gray-500 mt-1 leading-relaxed">{role.desc}</div>
-        </div>
-        {selected && (
-          <CheckCircle2 size={20} className="text-primary-600 shrink-0" />
-        )}
+      <div className="flex items-baseline justify-between gap-2 mb-3">
+        <span className="num text-[11px] tracking-widish text-ink-mute">N° {n}</span>
+        <span className={`text-[10px] tracking-wider2 uppercase ${selected ? 'text-ink' : 'text-ink-mute'}`}>
+          {selected ? '✓ נבחר' : 'לבחירה'}
+        </span>
       </div>
+      <div className="rule mb-3" />
+      <div className="display text-xl text-ink leading-tight mb-2">{role.name}</div>
+      <p className="text-[13px] text-ink-soft leading-relaxed">{role.desc}</p>
     </button>
   );
 }

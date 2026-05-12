@@ -1,11 +1,10 @@
 import { useEffect } from 'react';
-import { CheckCircle2, AlertTriangle, Info } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 const tones = {
-  success: { icon: CheckCircle2, classes: 'bg-emerald-50 border-emerald-200 text-emerald-800' },
-  warning: { icon: AlertTriangle, classes: 'bg-amber-50 border-amber-200 text-amber-800' },
-  info: { icon: Info, classes: 'bg-primary-50 border-primary-200 text-primary-800' },
+  success: { mark: '✓', label: 'אישור', classes: 'bg-paper border-ink text-ink' },
+  warning: { mark: '!', label: 'שימי לב', classes: 'bg-ochre-ghost border-ochre text-ochre' },
+  info: { mark: '·', label: 'הודעה', classes: 'bg-paper border-ink text-ink' },
 };
 
 export default function Toast() {
@@ -19,13 +18,16 @@ export default function Toast() {
 
   if (!toast) return null;
   const conf = tones[toast.tone] || tones.success;
-  const Icon = conf.icon;
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
-      <div className={`flex items-center gap-2 px-4 py-3 rounded-xl border shadow-lift ${conf.classes}`}>
-        <Icon size={18} />
-        <span className="text-sm font-medium">{toast.message}</span>
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 animate-fade-up">
+      <div className={`flex items-center gap-4 px-5 py-3 border shadow-ink-sm ${conf.classes}`}>
+        <span className="display text-xl leading-none">{conf.mark}</span>
+        <div className="h-6 w-px bg-current opacity-30" />
+        <div>
+          <div className="eyebrow text-current opacity-70 leading-none mb-0.5">{conf.label}</div>
+          <span className="text-sm font-medium">{toast.message}</span>
+        </div>
       </div>
     </div>
   );

@@ -1,28 +1,31 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
 
-export default function PageHeader({ title, subtitle, action, back = false, backTo }) {
+export default function PageHeader({ eyebrow, title, subtitle, action, back = false, backTo }) {
   const navigate = useNavigate();
 
   return (
-    <div className="mb-6 flex items-start justify-between gap-4">
-      <div className="flex items-center gap-3">
-        {back && (
-          <button
-            type="button"
-            onClick={() => (backTo ? navigate(backTo) : navigate(-1))}
-            className="w-9 h-9 rounded-lg bg-white border border-gray-200 text-gray-600 hover:text-primary-600 hover:border-primary-200 flex items-center justify-center transition-all"
-            aria-label="חזרה"
-          >
-            <ArrowRight size={18} />
-          </button>
-        )}
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{title}</h1>
-          {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+    <header className="mb-10 animate-fade-up">
+      <div className="flex items-start justify-between gap-6 mb-4">
+        <div className="flex-1 min-w-0">
+          {back && (
+            <button
+              type="button"
+              onClick={() => (backTo ? navigate(backTo) : navigate(-1))}
+              className="eyebrow text-ink-soft hover:text-ink transition-colors mb-3 inline-flex items-center gap-2"
+            >
+              <span className="text-base leading-none">→</span>
+              חזרה
+            </button>
+          )}
+          {eyebrow && <div className="eyebrow mb-2">{eyebrow}</div>}
+          <h1 className="display text-4xl md:text-5xl text-ink text-balance">{title}</h1>
+          {subtitle && (
+            <div className="text-sm text-ink-soft mt-3 leading-relaxed">{subtitle}</div>
+          )}
         </div>
+        {action && <div className="shrink-0">{action}</div>}
       </div>
-      {action}
-    </div>
+      <div className="rule-ink h-px animate-rule-in origin-right" />
+    </header>
   );
 }

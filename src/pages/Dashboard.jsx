@@ -1,9 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Users, Clock, CheckCircle2, TrendingUp, UserPlus } from 'lucide-react';
 import Sidebar from '../components/layout/Sidebar';
 import PageHeader from '../components/layout/Header';
-import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import EmptyState from '../components/ui/EmptyState';
 import CandidateRow from '../components/recruiter/CandidateRow';
@@ -13,25 +11,20 @@ import { questions } from '../data/questions';
 import { calculateScores } from '../lib/scoring';
 import { calculateFit } from '../lib/fit';
 
-function StatCard({ icon: Icon, label, value, tone = 'primary' }) {
-  const toneClasses = {
-    primary: 'bg-primary-50 text-primary-600',
-    accent: 'bg-accent-50 text-accent-600',
-    warning: 'bg-amber-50 text-amber-600',
-    success: 'bg-emerald-50 text-emerald-600',
-  };
+function StatBlock({ eyebrow, value, suffix, note }) {
   return (
-    <Card className="flex items-center gap-4">
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${toneClasses[tone]}`}>
-        <Icon size={22} />
-      </div>
-      <div>
-        <div className="text-2xl font-bold text-gray-900 leading-none" dir="ltr">
+    <div className="border-t border-ink pt-4 pb-2 px-1">
+      <div className="eyebrow mb-3">{eyebrow}</div>
+      <div className="flex items-baseline gap-1">
+        <span className="display text-5xl md:text-6xl text-ink leading-none" dir="ltr">
           {value}
-        </div>
-        <div className="text-sm text-gray-500 mt-1">{label}</div>
+        </span>
+        {suffix && (
+          <span className="display text-2xl text-ink-mute leading-none">{suffix}</span>
+        )}
       </div>
-    </Card>
+      {note && <div className="text-[12px] text-ink-mute mt-3">{note}</div>}
+    </div>
   );
 }
 
@@ -68,134 +61,126 @@ export default function Dashboard() {
           !c.name.toLowerCase().includes(q) &&
           !c.email.toLowerCase().includes(q) &&
           !(c.phone || '').includes(q)
-        ) {
-          return false;
-        }
+        ) return false;
       }
       return true;
     });
   }, [candidates, search, roleFilter, statusFilter]);
 
+  const today = new Date().toLocaleDateString('he-IL', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
+
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 px-4 md:px-8 py-6 md:py-10 max-w-[1400px] w-full mx-auto">
+      <main className="flex-1 px-6 md:px-12 py-8 md:py-14 max-w-[1400px] w-full mx-auto">
         <PageHeader
-          title="פלטפורמת אבחון אישיותי"
-          subtitle="ניהול מועמדים, שליחת שאלון BIG5 וניתוח התאמה לתפקיד"
+          eyebrow={`גליון יומי · ${today}`}
+          title="פנקס המועמדים"
+          subtitle="כל המועמדים שהוזמנו לשאלון, סטטוס מילוי וציון התאמה משוקלל לתפקיד."
           action={
-            <Button
-              size="lg"
-              onClick={() => navigate('/new')}
-              leftIcon={<Plus size={18} />}
-            >
-              מועמד חדש
+            <Button size="lg" onClick={() => navigate('/new')}>
+              מועמד חדש +
             </Button>
           }
         />
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
-          <StatCard icon={Users} label='סה"כ מועמדים' value={stats.total} tone="primary" />
-          <StatCard icon={Clock} label="ממתינים" value={stats.pending} tone="warning" />
-          <StatCard icon={CheckCircle2} label="הושלמו" value={stats.completed} tone="success" />
-          <StatCard
-            icon={TrendingUp}
-            label="ממוצע התאמה"
-            value={stats.avgFit ? `${stats.avgFit}%` : '—'}
-            tone="accent"
+        <section className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10 mb-12">
+          <StatBlock eyebrow="סך הכל" value={stats.total} note="מועמדים בפנקס" />
+          <StatBlock eyebrow="ממתינים" value={stats.pending} note="טרם הגישו תשובות" />
+          <StatBlock eyebrow="הושלמו" value={stats.completed} note="זמינים לקריאה" />
+          <StatBlock
+            eyebrow="ממוצע התאמה"
+            value={stats.avgFit || '—'}
+            suffix={stats.avgFit ? '%' : ''}
+            note="לפי משקלות התפקיד"
           />
-        </div>
+        </section>
 
-        <Card padding="p-4 md:p-5" className="mb-4">
-          <div className="flex flex-col md:flex-row gap-3 md:items-center">
+        <section className="mb-6">
+          <div className="flex items-baseline justify-between mb-4">
+            <div>
+              <div className="eyebrow mb-2">פרק II</div>
+              <h2 className="display text-2xl text-ink">רשימה מלאה</h2>
+            </div>
+            <div className="text-[12px] text-ink-mute">
+              <span className="num">{filtered.length}</span> מתוך{' '}
+              <span className="num">{candidates.length}</span>
+            </div>
+          </div>
+          <div className="rule-ink mb-5" />
+
+          <div className="flex flex-col md:flex-row gap-3 md:items-center mb-6">
             <div className="relative flex-1">
-              <Search
-                size={18}
-                className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-400 pointer-events-none"
-              />
+              <span className="absolute top-1/2 -translate-y-1/2 right-0 text-ink-mute text-[11px] tracking-widish uppercase">חיפוש</span>
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="חיפוש לפי שם, אימייל או טלפון"
-                className="w-full h-11 pr-10 pl-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:bg-white"
+                placeholder="שם · אימייל · טלפון"
+                className="w-full h-11 pr-16 pl-3 bg-transparent border-b border-ink-line text-[14px] focus:outline-none focus:border-ink transition-colors placeholder:text-ink-mute"
               />
             </div>
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="h-11 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+              className="h-11 px-3 bg-transparent border-b border-ink-line text-[13px] focus:outline-none focus:border-ink transition-colors cursor-pointer"
             >
               <option value="all">כל התפקידים</option>
               {roles.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.name}
-                </option>
+                <option key={r.id} value={r.id}>{r.name}</option>
               ))}
             </select>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="h-11 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+              className="h-11 px-3 bg-transparent border-b border-ink-line text-[13px] focus:outline-none focus:border-ink transition-colors cursor-pointer"
             >
               <option value="all">כל הסטטוסים</option>
               <option value="pending">ממתין</option>
               <option value="completed">הושלם</option>
             </select>
           </div>
-        </Card>
+        </section>
 
         {filtered.length === 0 ? (
           <EmptyState
-            icon={<UserPlus size={24} />}
             title={candidates.length === 0 ? 'אין מועמדים עדיין' : 'לא נמצאו מועמדים'}
             description={
               candidates.length === 0
-                ? 'התחילי בהוספת מועמד חדש כדי לשלוח לו את שאלון האישיות'
-                : 'נסי לשנות את מסנני החיפוש'
+                ? 'התחילי בהוספת מועמד חדש כדי לשלוח לו שאלון אישיות.'
+                : 'נסי לשנות את מסנני החיפוש למעלה.'
             }
             action={
               candidates.length === 0 ? (
-                <Button onClick={() => navigate('/new')} leftIcon={<Plus size={18} />}>
-                  הוסיפי מועמד ראשון
-                </Button>
+                <Button onClick={() => navigate('/new')}>הוסיפי מועמד ראשון</Button>
               ) : null
             }
           />
         ) : (
-          <Card padding="p-0" className="overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gray-50/70 border-b border-gray-100 text-right">
-                    <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                      שם
-                    </th>
-                    <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                      תפקיד
-                    </th>
-                    <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                      סטטוס
-                    </th>
-                    <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                      תאריך
-                    </th>
-                    <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                      התאמה
-                    </th>
-                    <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide text-left">
-                      פעולות
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((c) => (
-                    <CandidateRow key={c.id} candidate={c} onDelete={deleteCandidate} />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
+          <div className="overflow-x-auto -mx-4 px-4">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b-2 border-ink">
+                  <th className="py-3 px-4 text-right eyebrow">№</th>
+                  <th className="py-3 px-4 text-right eyebrow">מועמד</th>
+                  <th className="py-3 px-4 text-right eyebrow">תפקיד</th>
+                  <th className="py-3 px-4 text-right eyebrow">סטטוס</th>
+                  <th className="py-3 px-4 text-right eyebrow">תאריך</th>
+                  <th className="py-3 px-4 text-right eyebrow">התאמה</th>
+                  <th className="py-3 px-4 text-left eyebrow">פעולות</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((c, i) => (
+                  <CandidateRow key={c.id} candidate={c} index={i} onDelete={deleteCandidate} />
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </main>
     </div>

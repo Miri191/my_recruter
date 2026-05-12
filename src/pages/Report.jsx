@@ -7,66 +7,33 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   ResponsiveContainer,
-  Legend,
-  Tooltip,
 } from 'recharts';
-import {
-  TrendingUp,
-  Sparkles,
-  AlertTriangle,
-  MessageSquareQuote,
-  Download,
-  Mail,
-  Phone,
-} from 'lucide-react';
 import Sidebar from '../components/layout/Sidebar';
 import PageHeader from '../components/layout/Header';
-import Card from '../components/ui/Card';
-import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
+import Badge from '../components/ui/Badge';
 import ScoreBar from '../components/recruiter/ScoreBar';
 import { useApp } from '../context/AppContext';
 import { getRole } from '../data/roles';
 import { questions } from '../data/questions';
 import { dimensions, dimensionOrder } from '../data/dimensions';
 import { calculateScores } from '../lib/scoring';
-import { calculateFit, fitTone, fitLabel } from '../lib/fit';
+import { calculateFit, fitLabel } from '../lib/fit';
 import { generateInsights } from '../lib/insights';
 
-function FitCircle({ fit }) {
-  const tone = fitTone(fit);
-  const colorMap = {
-    success: { ring: 'text-emerald-500', text: 'text-emerald-600', bg: 'bg-emerald-50' },
-    warning: { ring: 'text-amber-500', text: 'text-amber-600', bg: 'bg-amber-50' },
-    danger: { ring: 'text-red-500', text: 'text-red-600', bg: 'bg-red-50' },
-  };
-  const c = colorMap[tone];
-  const radius = 56;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (fit / 100) * circumference;
-
+function FitDisplay({ fit }) {
+  const tone =
+    fit >= 75 ? 'text-sage' : fit >= 55 ? 'text-ochre' : 'text-oxblood';
   return (
-    <div className={`relative w-40 h-40 ${c.bg} rounded-full flex items-center justify-center`}>
-      <svg className="absolute inset-0 -rotate-90" viewBox="0 0 140 140">
-        <circle cx="70" cy="70" r={radius} fill="none" stroke="currentColor" className="text-white/70" strokeWidth="10" />
-        <circle
-          cx="70"
-          cy="70"
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          className={c.ring}
-          strokeWidth="10"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          style={{ transition: 'stroke-dashoffset 0.8s ease-out' }}
-        />
-      </svg>
-      <div className="text-center">
-        <div className={`text-4xl font-extrabold tabular-nums ${c.text}`} dir="ltr">{fit}%</div>
-        <div className="text-xs text-gray-600 mt-1">{fitLabel(fit)}</div>
+    <div className="text-center">
+      <div className="eyebrow mb-3">ציון התאמה כולל</div>
+      <div className="rule-ink mb-6" />
+      <div className={`display ${tone}`} dir="ltr">
+        <span className="text-[120px] md:text-[160px] leading-[0.9]">{fit}</span>
+        <span className="text-5xl text-ink-mute">%</span>
       </div>
+      <div className="rule-ink mt-6" />
+      <div className="eyebrow mt-3">{fitLabel(fit)}</div>
     </div>
   );
 }
@@ -99,8 +66,8 @@ export default function Report() {
     return (
       <div className="flex min-h-screen">
         <Sidebar />
-        <main className="flex-1 px-4 py-10 text-center">
-          <p className="text-gray-500">לא נמצא מועמד</p>
+        <main className="flex-1 px-6 py-14 text-center">
+          <p className="text-ink-soft">לא נמצא מועמד</p>
           <Button className="mt-4" onClick={() => navigate('/')}>חזרה</Button>
         </main>
       </div>
@@ -111,218 +78,220 @@ export default function Report() {
     return (
       <div className="flex min-h-screen">
         <Sidebar />
-        <main className="flex-1 px-4 md:px-8 py-10 max-w-3xl mx-auto w-full">
+        <main className="flex-1 px-6 md:px-12 py-14 max-w-3xl mx-auto w-full">
           <PageHeader title={candidate.name} subtitle="ממתין לסיום השאלון" back backTo="/" />
-          <Card className="text-center py-12">
-            <div className="text-5xl mb-3">⏳</div>
-            <h3 className="font-semibold text-gray-900 mb-1">המועמד עוד לא סיים</h3>
-            <p className="text-sm text-gray-500 mb-5">
+          <div className="bg-paper-light border border-ink-line p-12 text-center">
+            <div className="eyebrow mb-3">סטטוס</div>
+            <h3 className="display text-2xl text-ink mb-2">המועמד עוד לא סיים</h3>
+            <div className="rule mx-auto w-10 mb-4" />
+            <p className="text-sm text-ink-soft mb-6">
               הדוח יתעדכן אוטומטית כשהמועמד יסיים את השאלון
             </p>
-            <Button onClick={() => navigate(`/link/${id}`)}>פתחי את הקישור</Button>
-          </Card>
+            <Button onClick={() => navigate(`/link/${id}`)}>פתח קישור ←</Button>
+          </div>
         </main>
       </div>
     );
   }
 
   const { role, scores, fit, insights, radarData } = report;
+  const completedDate = candidate.completedAt
+    ? new Date(candidate.completedAt).toLocaleDateString('he-IL', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      })
+    : '';
 
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 px-4 md:px-8 py-6 md:py-10 max-w-6xl mx-auto w-full">
+      <main className="flex-1 px-6 md:px-12 py-8 md:py-14 max-w-6xl mx-auto w-full">
         <PageHeader
+          eyebrow={`גליון אישי · ${completedDate}`}
           title={candidate.name}
           subtitle={
-            <span className="flex items-center gap-3 flex-wrap text-sm text-gray-500">
-              <span className="flex items-center gap-1"><Mail size={13} /> <span dir="ltr">{candidate.email}</span></span>
-              <span className="flex items-center gap-1"><Phone size={13} /> <span dir="ltr">{candidate.phone}</span></span>
+            <span className="flex items-center gap-4 flex-wrap text-sm text-ink-soft">
+              <span dir="ltr">{candidate.email}</span>
+              <span className="text-ink-line">·</span>
+              <span dir="ltr">{candidate.phone}</span>
+              <span className="text-ink-line">·</span>
+              <span>{role.name}</span>
             </span>
           }
           back
           backTo="/"
           action={
-            <div className="flex items-center gap-2">
-              <Badge tone="primary" size="md">{role.name}</Badge>
-              <Button
-                variant="secondary"
-                leftIcon={<Download size={16} />}
-                onClick={() => {
-                  console.log('PDF export — coming soon', { candidate, scores, fit });
-                  alert('יצוא PDF — בקרוב!');
-                }}
-              >
-                הורדת PDF
-              </Button>
-            </div>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                console.log('PDF export — coming soon', { candidate, scores, fit });
+                alert('יצוא PDF — בקרוב');
+              }}
+            >
+              הורד PDF ↓
+            </Button>
           }
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
-          <Card className="lg:col-span-1 flex flex-col items-center justify-center text-center">
-            <div className="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-3">
-              ציון התאמה כולל
-            </div>
-            <FitCircle fit={fit} />
-            <p className="text-xs text-gray-500 mt-4 max-w-[220px] text-balance">
-              משוקלל לפי חשיבות כל ממד לתפקיד {role.name}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-16 items-center">
+          <div className="lg:col-span-5">
+            <FitDisplay fit={fit} />
+            <p className="text-[13px] text-ink-mute mt-6 text-center max-w-xs mx-auto leading-relaxed">
+              ציון משוקלל לפי חשיבות כל ממד אישיות לתפקיד <span className="text-ink underline-ink">{role.name}</span>.
             </p>
-          </Card>
+          </div>
 
-          <Card className="lg:col-span-2">
-            <div className="flex items-start justify-between mb-2">
+          <div className="lg:col-span-7">
+            <div className="flex items-baseline justify-between mb-3">
               <div>
-                <h3 className="font-semibold text-gray-900">פרופיל אישיותי</h3>
-                <p className="text-xs text-gray-500">מועמד מול אידיאלי לתפקיד</p>
+                <div className="eyebrow mb-1">פרק I</div>
+                <h2 className="display text-2xl text-ink">פרופיל אישיות</h2>
               </div>
-              <div className="flex items-center gap-3 text-xs">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-full bg-primary-500" /> המועמד
+              <div className="flex items-center gap-4 text-[11px] uppercase tracking-widish">
+                <span className="flex items-center gap-2 text-ink">
+                  <span className="w-4 h-px bg-ink" /> המועמד
                 </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-full bg-accent-500" /> אידיאלי
+                <span className="flex items-center gap-2 text-oxblood">
+                  <span className="w-4 border-t border-dashed border-oxblood" /> אידיאלי
                 </span>
               </div>
             </div>
-            <div className="h-80">
+            <div className="rule-ink mb-2" />
+            <div className="h-80 -mx-4">
               <ResponsiveContainer width="100%" height="100%">
-                <RadarChart data={radarData} outerRadius="75%">
-                  <PolarGrid stroke="#E5E7EB" />
+                <RadarChart data={radarData} outerRadius="72%">
+                  <PolarGrid stroke="#C9BFA9" strokeDasharray="2 4" />
                   <PolarAngleAxis
                     dataKey="dim"
-                    tick={{ fill: '#374151', fontSize: 13, fontWeight: 500 }}
+                    tick={{ fill: '#1B1714', fontSize: 12, fontFamily: 'Frank Ruhl Libre, serif' }}
                   />
                   <PolarRadiusAxis
                     angle={90}
                     domain={[0, 100]}
-                    tick={{ fill: '#9CA3AF', fontSize: 10 }}
+                    tick={{ fill: '#7B7264', fontSize: 9, fontFamily: 'Heebo, sans-serif' }}
                     tickCount={5}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      borderRadius: 12,
-                      border: '1px solid #E5E7EB',
-                      fontSize: 13,
-                      direction: 'rtl',
-                    }}
+                    axisLine={false}
                   />
                   <Radar
                     name="המועמד"
                     dataKey="candidate"
-                    stroke="#4F46E5"
-                    fill="#6366F1"
-                    fillOpacity={0.35}
-                    strokeWidth={2}
+                    stroke="#1B1714"
+                    fill="#1B1714"
+                    fillOpacity={0.12}
+                    strokeWidth={1.5}
                   />
                   <Radar
                     name="אידיאלי"
                     dataKey="ideal"
-                    stroke="#0D9488"
-                    fill="#14B8A6"
-                    fillOpacity={0.15}
-                    strokeWidth={2}
-                    strokeDasharray="6 4"
+                    stroke="#7A2929"
+                    fill="#7A2929"
+                    fillOpacity={0.05}
+                    strokeWidth={1.5}
+                    strokeDasharray="4 3"
                   />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
-          </Card>
-        </div>
-
-        <Card className="mb-5">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-9 h-9 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center">
-              <TrendingUp size={18} />
-            </div>
-            <h3 className="font-semibold text-gray-900">פירוט לפי ממדים</h3>
           </div>
-          <div className="space-y-4">
+        </section>
+
+        <section className="mb-16">
+          <div className="flex items-baseline gap-4 mb-5">
+            <span className="num text-[11px] tracking-widish text-ink-mute">II</span>
+            <h2 className="display text-2xl text-ink">פירוט לפי ממדים</h2>
+            <div className="flex-1 rule-ink h-px" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-1">
             {dimensionOrder.map((d) => (
               <ScoreBar key={d} dim={d} score={scores[d]} ideal={role.ideal[d]} />
             ))}
           </div>
-          <p className="text-xs text-gray-400 mt-4">
-            הסימן האנכי הקטן בכל פס מסמן את הציון האידיאלי לתפקיד.
+          <p className="text-[12px] text-ink-mute mt-5 leading-relaxed max-w-md">
+            הקו האנכי האדום מסמן את הציון האידיאלי לתפקיד. הקו השחור — ציון המועמד.
           </p>
-        </Card>
+        </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <Card className="lg:col-span-1 bg-emerald-50/40 border-emerald-100">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                <Sparkles size={18} />
-              </div>
-              <h3 className="font-semibold text-gray-900">חוזקות</h3>
-            </div>
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-12">
+          <div>
+            <div className="eyebrow mb-2">פרק III · א</div>
+            <h3 className="display text-2xl text-ink mb-3">חוזקות</h3>
+            <div className="rule-ink mb-5" />
             {insights.strengths.length === 0 ? (
-              <p className="text-sm text-gray-500">אין ממד שבולט במיוחד מעל הציפיות לתפקיד.</p>
+              <p className="text-[14px] text-ink-soft leading-relaxed">
+                אין ממד שבולט במיוחד מעל הציפיות לתפקיד.
+              </p>
             ) : (
-              <ul className="space-y-3">
+              <ul className="space-y-5">
                 {insights.strengths.map((s) => (
-                  <li key={s.dim} className="bg-white rounded-lg p-3 border border-emerald-100">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-semibold text-gray-900 text-sm">{s.name}</span>
-                      <Badge tone="success" size="sm">{s.score}/100</Badge>
+                  <li key={s.dim} className="border-r-2 border-sage pr-4">
+                    <div className="flex items-baseline justify-between mb-1">
+                      <span className="display text-[17px] text-ink">{s.name}</span>
+                      <span className="num text-sage text-sm" dir="ltr">{s.score}/100</span>
                     </div>
-                    <p className="text-xs text-gray-600 leading-relaxed">{s.copy}</p>
+                    <p className="text-[13px] text-ink-soft leading-relaxed">{s.copy}</p>
                   </li>
                 ))}
               </ul>
             )}
-          </Card>
+          </div>
 
-          <Card className="lg:col-span-1 bg-amber-50/40 border-amber-100">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-9 h-9 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
-                <AlertTriangle size={18} />
-              </div>
-              <h3 className="font-semibold text-gray-900">נקודות לתשומת לב</h3>
-            </div>
+          <div>
+            <div className="eyebrow mb-2">פרק III · ב</div>
+            <h3 className="display text-2xl text-ink mb-3">נקודות לתשומת לב</h3>
+            <div className="rule-ink mb-5" />
             {insights.concerns.length === 0 ? (
-              <p className="text-sm text-gray-500">לא זוהו פערים משמעותיים מול דרישות התפקיד.</p>
+              <p className="text-[14px] text-ink-soft leading-relaxed">
+                לא זוהו פערים משמעותיים מול דרישות התפקיד.
+              </p>
             ) : (
-              <ul className="space-y-3">
+              <ul className="space-y-5">
                 {insights.concerns.map((c) => (
-                  <li key={c.dim} className="bg-white rounded-lg p-3 border border-amber-100">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-semibold text-gray-900 text-sm">{c.name}</span>
-                      <Badge tone="warning" size="sm" dir="ltr">
+                  <li key={c.dim} className="border-r-2 border-oxblood pr-4">
+                    <div className="flex items-baseline justify-between mb-1">
+                      <span className="display text-[17px] text-ink">{c.name}</span>
+                      <span className="num text-oxblood text-sm" dir="ltr">
                         {c.score} / {c.ideal}
-                      </Badge>
+                      </span>
                     </div>
-                    <p className="text-xs text-gray-600 leading-relaxed">{c.copy}</p>
+                    <p className="text-[13px] text-ink-soft leading-relaxed">{c.copy}</p>
                   </li>
                 ))}
               </ul>
             )}
-          </Card>
+          </div>
 
-          <Card className="lg:col-span-1 bg-primary-50/40 border-primary-100">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-9 h-9 rounded-lg bg-primary-100 text-primary-700 flex items-center justify-center">
-                <MessageSquareQuote size={18} />
-              </div>
-              <h3 className="font-semibold text-gray-900">שאלות לראיון</h3>
-            </div>
+          <div>
+            <div className="eyebrow mb-2">פרק III · ג</div>
+            <h3 className="display text-2xl text-ink mb-3">שאלות לראיון</h3>
+            <div className="rule-ink mb-5" />
             {insights.interviewQuestions.length === 0 ? (
-              <p className="text-sm text-gray-500">אין צורך בשאלות מיקוד מיוחדות.</p>
+              <p className="text-[14px] text-ink-soft leading-relaxed">
+                אין צורך בשאלות מיקוד מיוחדות.
+              </p>
             ) : (
-              <ol className="space-y-3">
+              <ol className="space-y-5">
                 {insights.interviewQuestions.map((iq, i) => (
-                  <li key={i} className="bg-white rounded-lg p-3 border border-primary-100">
-                    <Badge tone="primary" size="sm" className="mb-1.5">{iq.name}</Badge>
-                    <p className="text-sm text-gray-800 leading-relaxed">{iq.q}</p>
+                  <li key={i} className="flex gap-3">
+                    <span className="num text-[11px] tracking-widish text-ink-mute pt-1 w-6 shrink-0" dir="ltr">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <div>
+                      <div className="eyebrow text-ink-mute mb-1.5">{iq.name}</div>
+                      <p className="text-[14px] text-ink-soft leading-relaxed">{iq.q}</p>
+                    </div>
                   </li>
                 ))}
               </ol>
             )}
-          </Card>
-        </div>
+          </div>
+        </section>
 
-        <div className="text-xs text-gray-400 mt-6 text-center">
-          הדוח מבוסס על שאלון BIG5 (50 שאלות) ומציג ציון התאמה משוקלל לתפקיד הספציפי.
-        </div>
+        <footer className="border-t-2 border-ink pt-6 flex items-baseline justify-between text-[11px] tracking-widish uppercase text-ink-mute">
+          <span>אורקל · אבחון אישיות</span>
+          <span className="num" dir="ltr">№ {id?.slice(0, 8).toUpperCase()}</span>
+          <span>BIG5 · IPIP 50</span>
+        </footer>
       </main>
     </div>
   );

@@ -1,28 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Mail, Phone, User } from 'lucide-react';
 import Sidebar from '../components/layout/Sidebar';
 import PageHeader from '../components/layout/Header';
-import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import RoleCard from '../components/recruiter/RoleCard';
 import { roles } from '../data/roles';
 import { useApp } from '../context/AppContext';
 
-function Field({ label, icon: Icon, error, children }) {
+function Field({ label, hint, error, children }) {
   return (
     <label className="block">
-      <span className="text-sm font-medium text-gray-700 mb-1.5 block">{label}</span>
-      <div className="relative">
-        {Icon && (
-          <Icon
-            size={18}
-            className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-400 pointer-events-none"
-          />
-        )}
-        {children}
+      <div className="flex items-baseline justify-between mb-2">
+        <span className="eyebrow">{label}</span>
+        {hint && <span className="text-[11px] text-ink-mute">{hint}</span>}
       </div>
-      {error && <span className="text-xs text-red-600 mt-1 block">{error}</span>}
+      {children}
+      {error && <span className="text-[12px] text-oxblood mt-1.5 block">{error}</span>}
     </label>
   );
 }
@@ -61,37 +54,38 @@ export default function NewInvitation() {
       email: form.email.trim(),
       phone: form.phone.trim(),
     });
-    showToast('המועמד נוצר בהצלחה', 'success');
+    showToast('המועמד נכתב לפנקס', 'success');
     setTimeout(() => navigate(`/link/${c.id}`), 150);
   };
 
   const inputBase =
-    'w-full h-11 pr-10 pl-3 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all';
+    'w-full h-11 px-0 bg-transparent border-b border-ink-line text-[15px] focus:outline-none focus:border-ink transition-colors placeholder:text-ink-mute';
 
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 px-4 md:px-8 py-6 md:py-10 max-w-3xl mx-auto w-full">
+      <main className="flex-1 px-6 md:px-12 py-8 md:py-14 max-w-4xl mx-auto w-full">
         <PageHeader
+          eyebrow="פרק III · הזמנה חדשה"
           title="מועמד חדש"
-          subtitle="מלאי פרטים ובחרי תפקיד — אנחנו ניצור קישור לשליחה"
+          subtitle="ראשית — בחירת תפקיד. אחר־כך פרטי המועמד. בסוף — נפיק קישור אישי לשליחה."
           back
           backTo="/"
         />
 
-        <form onSubmit={onSubmit} className="space-y-5">
-          <Card>
-            <div className="mb-4">
-              <h2 className="text-base font-semibold text-gray-900">1. בחרי תפקיד</h2>
-              <p className="text-sm text-gray-500 mt-0.5">
-                כל תפקיד מוגדר עם פרופיל אישיות אידיאלי שונה
-              </p>
+        <form onSubmit={onSubmit}>
+          <section className="mb-12">
+            <div className="flex items-baseline gap-4 mb-5">
+              <span className="num text-[11px] tracking-widish text-ink-mute">01</span>
+              <h2 className="display text-2xl text-ink">בחירת תפקיד</h2>
+              <div className="flex-1 rule h-px" />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {roles.map((r) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {roles.map((r, i) => (
                 <RoleCard
                   key={r.id}
                   role={r}
+                  index={i}
                   selected={roleId === r.id}
                   onClick={() => {
                     setRoleId(r.id);
@@ -100,29 +94,28 @@ export default function NewInvitation() {
                 />
               ))}
             </div>
-            {errors.role && <p className="text-xs text-red-600 mt-3">{errors.role}</p>}
-          </Card>
+            {errors.role && <p className="text-[12px] text-oxblood mt-3">{errors.role}</p>}
+          </section>
 
-          <Card>
-            <div className="mb-4">
-              <h2 className="text-base font-semibold text-gray-900">2. פרטי המועמד</h2>
-              <p className="text-sm text-gray-500 mt-0.5">
-                המידע ישמש לזיהוי בלבד — לא נשלח אוטומטית
-              </p>
+          <section className="mb-12">
+            <div className="flex items-baseline gap-4 mb-5">
+              <span className="num text-[11px] tracking-widish text-ink-mute">02</span>
+              <h2 className="display text-2xl text-ink">פרטי המועמד</h2>
+              <div className="flex-1 rule h-px" />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
               <div className="md:col-span-2">
-                <Field label="שם מלא" icon={User} error={errors.name}>
+                <Field label="שם מלא" error={errors.name}>
                   <input
                     type="text"
                     value={form.name}
                     onChange={setField('name')}
-                    placeholder="לדוגמה: דנה לוי"
+                    placeholder="דנה לוי"
                     className={inputBase}
                   />
                 </Field>
               </div>
-              <Field label="אימייל" icon={Mail} error={errors.email}>
+              <Field label="אימייל" hint="לזיהוי בלבד" error={errors.email}>
                 <input
                   type="email"
                   value={form.email}
@@ -132,7 +125,7 @@ export default function NewInvitation() {
                   dir="ltr"
                 />
               </Field>
-              <Field label="טלפון" icon={Phone} error={errors.phone}>
+              <Field label="טלפון" hint="לשיתוף ב־WhatsApp" error={errors.phone}>
                 <input
                   type="tel"
                   value={form.phone}
@@ -143,19 +136,19 @@ export default function NewInvitation() {
                 />
               </Field>
             </div>
-          </Card>
+          </section>
 
-          <div className="flex justify-between items-center gap-3 sticky bottom-4">
-            <Button variant="ghost" onClick={() => navigate(-1)}>
-              ביטול
-            </Button>
-            <Button
-              type="submit"
-              size="lg"
-              disabled={submitting}
-              rightIcon={<ArrowLeft size={18} />}
+          <div className="rule-ink mb-6" />
+          <div className="flex items-center justify-between gap-4">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="eyebrow text-ink-soft hover:text-ink"
             >
-              צרי קישור
+              ביטול
+            </button>
+            <Button type="submit" size="lg" disabled={submitting}>
+              הפק קישור ←
             </Button>
           </div>
         </form>

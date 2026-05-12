@@ -1,14 +1,18 @@
 export default function MobileFrame({ children, fullScreenOnMobile = true }) {
   if (fullScreenOnMobile) {
     return (
-      <div className="min-h-screen md:py-10 md:bg-gradient-to-br md:from-primary-50 md:via-white md:to-accent-50">
-        <div className="md:max-w-md md:mx-auto md:rounded-[2.5rem] md:overflow-hidden md:shadow-2xl md:border md:border-gray-200/70 md:bg-white">
-          <div className="bg-white min-h-screen md:min-h-[760px] md:max-h-[760px] md:overflow-y-auto scrollbar-thin">
-            {children}
+      <div className="min-h-screen md:py-12 bg-paper">
+        <div className="md:max-w-[420px] md:mx-auto md:border md:border-ink md:shadow-ink relative">
+          <div className="bg-paper-light min-h-screen md:min-h-[760px] md:max-h-[760px] md:overflow-y-auto scrollbar-thin">
+            <div className="hidden md:flex items-center justify-between absolute top-0 inset-x-0 px-5 py-3 border-b border-ink-line text-[10px] tracking-wider2 uppercase text-ink-mute z-10 bg-paper-light/95 backdrop-blur-sm">
+              <span>Personal · Confidential</span>
+              <span className="num">Vol. 01</span>
+            </div>
+            <div className="md:pt-10">{children}</div>
           </div>
         </div>
       </div>
     );
   }
-  return <div className="min-h-screen bg-white">{children}</div>;
+  return <div className="min-h-screen bg-paper-light">{children}</div>;
 }

@@ -4,14 +4,20 @@ export default function Card({
   padding = 'p-6',
   as: Tag = 'div',
   hover = false,
+  variant = 'default',
   ...props
 }) {
+  const variants = {
+    default: 'bg-paper-light border border-ink-line',
+    ink: 'bg-paper-light border border-ink',
+    plain: 'bg-transparent border border-ink-line',
+  };
   return (
     <Tag
       className={`
-        bg-white rounded-xl border border-gray-100 shadow-card
+        ${variants[variant]}
         ${padding}
-        ${hover ? 'transition-all duration-200 hover:shadow-lift hover:border-primary-200 cursor-pointer' : ''}
+        ${hover ? 'transition-all duration-200 hover:border-ink hover:shadow-ink-sm hover:translate-x-[-1px] hover:translate-y-[-1px] cursor-pointer' : ''}
         ${className}
       `}
       {...props}
@@ -21,12 +27,13 @@ export default function Card({
   );
 }
 
-export function CardHeader({ title, subtitle, action, className = '' }) {
+export function CardHeader({ eyebrow, title, subtitle, action, className = '' }) {
   return (
-    <div className={`flex items-start justify-between gap-3 ${className}`}>
+    <div className={`flex items-start justify-between gap-4 ${className}`}>
       <div>
-        {title && <h2 className="text-lg font-semibold text-gray-900">{title}</h2>}
-        {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+        {eyebrow && <div className="eyebrow mb-2">{eyebrow}</div>}
+        {title && <h2 className="display text-2xl text-ink">{title}</h2>}
+        {subtitle && <p className="text-sm text-ink-soft mt-2 leading-relaxed">{subtitle}</p>}
       </div>
       {action}
     </div>

@@ -3,35 +3,35 @@ import { dimensions } from '../../data/dimensions';
 export default function ScoreBar({ dim, score, ideal }) {
   const meta = dimensions[dim];
   const diff = score - ideal;
-  const diffLabel =
-    diff === 0 ? 'תואם' : diff > 0 ? `+${diff} מעל` : `${diff} מתחת`;
-  const diffColor = Math.abs(diff) <= 10 ? 'text-emerald-600' : Math.abs(diff) <= 20 ? 'text-amber-600' : 'text-red-600';
+  const within = Math.abs(diff) <= 10;
+  const diffLabel = diff === 0 ? 'תואם' : diff > 0 ? `+${diff}` : `${diff}`;
+  const diffTone = within ? 'text-sage' : Math.abs(diff) <= 20 ? 'text-ochre' : 'text-oxblood';
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-1.5">
-        <div className="flex items-center gap-2">
-          <span className={`w-2.5 h-2.5 rounded-full ${meta.classes.dot}`} />
-          <span className="font-medium text-gray-800 text-sm">{meta.name}</span>
+    <div className="py-3">
+      <div className="flex items-baseline justify-between mb-2.5 gap-3">
+        <div className="flex items-baseline gap-3 min-w-0">
+          <span className="num text-[11px] tracking-widish text-ink-mute uppercase shrink-0">{meta.key}</span>
+          <span className="display text-[17px] text-ink truncate">{meta.name}</span>
         </div>
-        <div className="flex items-center gap-3 text-xs">
-          <span className={`font-semibold ${diffColor}`} dir="ltr">{diffLabel}</span>
-          <span className="font-bold text-gray-900 text-base" dir="ltr">
+        <div className="flex items-baseline gap-4 shrink-0">
+          <span className={`num text-[12px] tracking-widish ${diffTone}`} dir="ltr">{diffLabel}</span>
+          <span className="num text-xl text-ink" dir="ltr">
             {score}
-            <span className="text-gray-400 font-normal mx-0.5">/</span>
-            <span className="text-gray-400 font-normal">{ideal}</span>
+            <span className="text-ink-mute font-normal mx-0.5">/</span>
+            <span className="text-ink-mute font-normal">{ideal}</span>
           </span>
         </div>
       </div>
-      <div className="relative h-2.5 bg-gray-100 rounded-full overflow-hidden">
+      <div className="relative h-[2px] bg-ink-line">
         <div
-          className="absolute top-0 right-0 w-px h-full bg-gray-400 z-10"
-          style={{ right: `${ideal}%` }}
-          title="הציון האידיאלי לתפקיד"
+          className="absolute top-0 right-0 h-[2px] bg-ink transition-all duration-700 ease-out"
+          style={{ width: `${score}%` }}
         />
         <div
-          className={`absolute top-0 right-0 h-full rounded-full transition-all duration-500 ${meta.classes.bar}`}
-          style={{ width: `${score}%` }}
+          className="absolute -top-1 h-3 w-px bg-oxblood"
+          style={{ right: `calc(${ideal}% - 0.5px)` }}
+          title="ציון אידיאלי לתפקיד"
         />
       </div>
     </div>
