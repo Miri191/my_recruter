@@ -5,25 +5,23 @@ export default function ScoreBar({ dim, score, ideal }) {
   const diff = score - ideal;
   const absDiff = Math.abs(diff);
   const within = absDiff <= 10;
-  const tone =
-    within ? 'forest' : absDiff <= 20 ? 'ochre' : 'oxblood';
-  const barColor =
+  const fitBarColor =
     within ? 'bg-forest' : absDiff <= 20 ? 'bg-ochre' : 'bg-oxblood';
   const diffLabel = diff === 0 ? 'תואם' : diff > 0 ? `+${diff}` : `${diff}`;
-  const toneText =
-    tone === 'forest' ? 'text-forest' : tone === 'ochre' ? 'text-ochre' : 'text-oxblood';
+  const fitTextColor =
+    within ? 'text-forest' : absDiff <= 20 ? 'text-ochre' : 'text-oxblood';
 
   return (
     <div className="py-3.5">
       <div className="flex items-baseline justify-between mb-2.5 gap-3">
         <div className="flex items-baseline gap-3 min-w-0">
-          <span className="num text-[10px] tracking-widish text-ink-mute uppercase shrink-0 border border-ink-line px-1.5 py-0.5">
+          <span className={`num text-[11px] tracking-widish uppercase shrink-0 ${meta.classes.bgGhost} ${meta.classes.text} ${meta.classes.borderSoft} border px-1.5 py-0.5 font-semibold`}>
             {meta.key}
           </span>
           <span className="display text-[17px] text-ink truncate">{meta.name}</span>
         </div>
         <div className="flex items-baseline gap-4 shrink-0">
-          <span className={`num text-[12px] tracking-widish ${toneText}`} dir="ltr">{diffLabel}</span>
+          <span className={`num text-[12px] tracking-widish ${fitTextColor}`} dir="ltr">{diffLabel}</span>
           <span className="num text-xl text-ink" dir="ltr">
             {score}
             <span className="text-ink-mute font-normal mx-0.5">/</span>
@@ -31,9 +29,9 @@ export default function ScoreBar({ dim, score, ideal }) {
           </span>
         </div>
       </div>
-      <div className="relative h-2 bg-paper-dark/50 border border-ink-line/60">
+      <div className="relative h-2 bg-paper-dark border border-ink-line/60">
         <div
-          className={`absolute top-0 right-0 h-full ${barColor} transition-all duration-700 ease-out`}
+          className={`absolute top-0 right-0 h-full ${fitBarColor} transition-all duration-700 ease-out`}
           style={{ width: `${score}%` }}
         />
         <div

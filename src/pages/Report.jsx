@@ -22,6 +22,46 @@ import { calculateScores } from '../lib/scoring';
 import { calculateFit, fitLabel } from '../lib/fit';
 import { generateInsights } from '../lib/insights';
 
+const nameToStroke = Object.values(dimensions).reduce((acc, d) => {
+  acc[d.name] = d.classes.stroke;
+  return acc;
+}, {});
+
+function CustomAxisTick({ x, y, payload, textAnchor }) {
+  const color = nameToStroke[payload?.value] || '#1B1714';
+  return (
+    <text
+      x={x}
+      y={y}
+      fill={color}
+      fontSize={12}
+      fontFamily="Frank Ruhl Libre, serif"
+      fontWeight={500}
+      textAnchor={textAnchor}
+      dy={4}
+    >
+      {payload?.value}
+    </text>
+  );
+}
+
+function DimensionLegend() {
+  return (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 px-2">
+      {dimensionOrder.map((d) => {
+        const m = dimensions[d];
+        return (
+          <span key={d} className="flex items-center gap-1.5 text-[11px] tracking-widish uppercase">
+            <span className={`w-2 h-2 rounded-full ${m.classes.dot}`} />
+            <span className={`${m.classes.text} font-medium`}>{m.key}</span>
+            <span className="text-ink-soft">{m.name}</span>
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
 function FitDisplay({ fit }) {
   const tone =
     fit >= 75 ? { color: 'text-forest', bg: 'bg-forest-tint', border: 'border-forest', accent: 'forest' }
@@ -155,11 +195,11 @@ export default function Report() {
                 <h2 className="display text-2xl text-ink">פרופיל אישיות</h2>
               </div>
               <div className="flex items-center gap-4 text-[11px] uppercase tracking-widish">
-                <span className="flex items-center gap-2 text-petrol font-medium">
-                  <span className="w-4 h-[3px] bg-petrol" /> המועמד
+                <span className="flex items-center gap-2 text-ink font-medium">
+                  <span className="w-4 h-[3px] bg-ink" /> המועמד
                 </span>
-                <span className="flex items-center gap-2 text-brick font-medium">
-                  <span className="w-4 border-t-[3px] border-dashed border-brick" /> אידיאלי
+                <span className="flex items-center gap-2 text-ink-mute font-medium">
+                  <span className="w-4 border-t-[3px] border-dashed border-ink-mute" /> אידיאלי
                 </span>
               </div>
             </div>
@@ -167,11 +207,8 @@ export default function Report() {
             <div className="h-80 -mx-4">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={radarData} outerRadius="72%">
-                  <PolarGrid stroke="#C9BFA9" strokeDasharray="2 4" />
-                  <PolarAngleAxis
-                    dataKey="dim"
-                    tick={{ fill: '#1B1714', fontSize: 12, fontFamily: 'Frank Ruhl Libre, serif' }}
-                  />
+                  <PolarGrid stroke="#E0DCD3" strokeDasharray="2 4" />
+                  <PolarAngleAxis dataKey="dim" tick={<CustomAxisTick />} />
                   <PolarRadiusAxis
                     angle={90}
                     domain={[0, 100]}
@@ -182,22 +219,26 @@ export default function Report() {
                   <Radar
                     name="המועמד"
                     dataKey="candidate"
-                    stroke="#1A5868"
-                    fill="#1A5868"
-                    fillOpacity={0.22}
+                    stroke="#1B1714"
+                    fill="#1B1714"
+                    fillOpacity={0.16}
                     strokeWidth={2}
                   />
                   <Radar
                     name="אידיאלי"
                     dataKey="ideal"
-                    stroke="#B85C38"
-                    fill="#B85C38"
-                    fillOpacity={0.08}
-                    strokeWidth={2}
+                    stroke="#7B7264"
+                    fill="#7B7264"
+                    fillOpacity={0.05}
+                    strokeWidth={1.5}
                     strokeDasharray="5 3"
                   />
                 </RadarChart>
               </ResponsiveContainer>
+            </div>
+            <div className="border-t border-ink-line/60 pt-3">
+              <div className="eyebrow mb-2 text-ink-mute">מקרא ממדים</div>
+              <DimensionLegend />
             </div>
           </Card>
         </section>
@@ -215,7 +256,10 @@ export default function Report() {
           </div>
           <p className="text-[12px] text-ink-mute mt-5 leading-relaxed max-w-lg">
             <span className="inline-block w-3 h-[2px] bg-ink align-middle mx-1" /> מסמן את הציון האידיאלי לתפקיד.
-            הצבע של הפס מסמן את גובה ההתאמה: ירוק — תואם, חמרה — פער קל, אדום — פער גדול.
+            הצבע של הפס מסמן את גובה ההתאמה:{' '}
+            <span className="text-forest font-medium">ירוק — תואם</span>,{' '}
+            <span className="text-ochre font-medium">חמרה — פער קל</span>,{' '}
+            <span className="text-oxblood font-medium">אדום — פער גדול</span>.
           </p>
         </Card>
 
@@ -233,17 +277,23 @@ export default function Report() {
               </p>
             ) : (
               <ul className="space-y-5">
-                {insights.strengths.map((s) => (
-                  <li key={s.dim}>
-                    <div className="flex items-baseline justify-between mb-1.5">
-                      <span className="display text-[17px] text-ink">{s.name}</span>
-                      <Badge tone="forest" size="sm">
-                        <span className="num" dir="ltr">{s.score}/100</span>
-                      </Badge>
-                    </div>
-                    <p className="text-[13px] text-ink-soft leading-relaxed">{s.copy}</p>
-                  </li>
-                ))}
+                {insights.strengths.map((s) => {
+                  const dimMeta = dimensions[s.dim];
+                  return (
+                    <li key={s.dim}>
+                      <div className="flex items-baseline justify-between mb-1.5 gap-2">
+                        <div className="flex items-baseline gap-2 min-w-0">
+                          <span className={`w-1.5 h-1.5 rounded-full ${dimMeta.classes.dot} shrink-0 self-center`} />
+                          <span className="display text-[17px] text-ink">{s.name}</span>
+                        </div>
+                        <Badge tone="forest" size="sm">
+                          <span className="num" dir="ltr">{s.score}/100</span>
+                        </Badge>
+                      </div>
+                      <p className="text-[13px] text-ink-soft leading-relaxed">{s.copy}</p>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </Card>
@@ -261,17 +311,23 @@ export default function Report() {
               </p>
             ) : (
               <ul className="space-y-5">
-                {insights.concerns.map((c) => (
-                  <li key={c.dim}>
-                    <div className="flex items-baseline justify-between mb-1.5">
-                      <span className="display text-[17px] text-ink">{c.name}</span>
-                      <Badge tone="ochre" size="sm">
-                        <span className="num" dir="ltr">{c.score} / {c.ideal}</span>
-                      </Badge>
-                    </div>
-                    <p className="text-[13px] text-ink-soft leading-relaxed">{c.copy}</p>
-                  </li>
-                ))}
+                {insights.concerns.map((c) => {
+                  const dimMeta = dimensions[c.dim];
+                  return (
+                    <li key={c.dim}>
+                      <div className="flex items-baseline justify-between mb-1.5 gap-2">
+                        <div className="flex items-baseline gap-2 min-w-0">
+                          <span className={`w-1.5 h-1.5 rounded-full ${dimMeta.classes.dot} shrink-0 self-center`} />
+                          <span className="display text-[17px] text-ink">{c.name}</span>
+                        </div>
+                        <Badge tone="ochre" size="sm">
+                          <span className="num" dir="ltr">{c.score} / {c.ideal}</span>
+                        </Badge>
+                      </div>
+                      <p className="text-[13px] text-ink-soft leading-relaxed">{c.copy}</p>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </Card>
@@ -289,17 +345,23 @@ export default function Report() {
               </p>
             ) : (
               <ol className="space-y-5">
-                {insights.interviewQuestions.map((iq, i) => (
-                  <li key={i} className="flex gap-3">
-                    <span className="num text-[12px] tracking-widish text-petrol pt-1 w-6 shrink-0 font-semibold" dir="ltr">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <div>
-                      <Badge tone="petrol" size="sm" className="mb-2">{iq.name}</Badge>
-                      <p className="text-[14px] text-ink-soft leading-relaxed">{iq.q}</p>
-                    </div>
-                  </li>
-                ))}
+                {insights.interviewQuestions.map((iq, i) => {
+                  const dimMeta = dimensions[iq.dim];
+                  return (
+                    <li key={i} className="flex gap-3">
+                      <span className={`num text-[12px] tracking-widish ${dimMeta.classes.text} pt-1 w-6 shrink-0 font-semibold`} dir="ltr">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <div>
+                        <span className={`inline-flex items-center gap-1.5 border font-medium uppercase text-[10px] tracking-wider2 px-2 py-[3px] mb-2 ${dimMeta.classes.bgGhost} ${dimMeta.classes.text} ${dimMeta.classes.borderSoft}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${dimMeta.classes.dot}`} />
+                          {iq.name}
+                        </span>
+                        <p className="text-[14px] text-ink-soft leading-relaxed">{iq.q}</p>
+                      </div>
+                    </li>
+                  );
+                })}
               </ol>
             )}
           </Card>

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Users, Clock, CheckCircle2, TrendingUp } from 'lucide-react';
 import Sidebar from '../components/layout/Sidebar';
 import PageHeader from '../components/layout/Header';
 import Button from '../components/ui/Button';
@@ -12,22 +13,29 @@ import { questions } from '../data/questions';
 import { calculateScores } from '../lib/scoring';
 import { calculateFit } from '../lib/fit';
 
-function StatBlock({ eyebrow, value, suffix, note, accent }) {
+function StatBlock({ eyebrow, value, suffix, note, accent, icon: Icon }) {
   const accentMap = {
-    petrol: { eyebrowCol: 'text-petrol', numCol: 'text-ink', dot: 'bg-petrol' },
-    ochre: { eyebrowCol: 'text-ochre', numCol: 'text-ink', dot: 'bg-ochre' },
-    forest: { eyebrowCol: 'text-forest', numCol: 'text-ink', dot: 'bg-forest' },
-    brick: { eyebrowCol: 'text-brick', numCol: 'text-ink', dot: 'bg-brick' },
+    petrol: { eyebrowCol: 'text-petrol', iconBg: 'bg-petrol-tint text-petrol border-petrol/30', dot: 'bg-petrol' },
+    ochre: { eyebrowCol: 'text-ochre', iconBg: 'bg-ochre-tint text-ochre border-ochre/30', dot: 'bg-ochre' },
+    forest: { eyebrowCol: 'text-forest', iconBg: 'bg-forest-tint text-forest border-forest/30', dot: 'bg-forest' },
+    brick: { eyebrowCol: 'text-brick', iconBg: 'bg-brick-tint text-brick border-brick/30', dot: 'bg-brick' },
   };
   const a = accentMap[accent] || accentMap.petrol;
   return (
     <Card variant="elev" accent={accent} padding="p-5">
-      <div className="flex items-center gap-2 mb-3">
-        <span className={`w-1.5 h-1.5 rounded-full ${a.dot}`} />
-        <span className={`eyebrow ${a.eyebrowCol} font-semibold`}>{eyebrow}</span>
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span className={`w-1.5 h-1.5 rounded-full ${a.dot}`} />
+          <span className={`eyebrow ${a.eyebrowCol} font-semibold`}>{eyebrow}</span>
+        </div>
+        {Icon && (
+          <span className={`inline-flex items-center justify-center w-8 h-8 border ${a.iconBg}`}>
+            <Icon size={16} strokeWidth={1.75} />
+          </span>
+        )}
       </div>
       <div className="flex items-baseline gap-1">
-        <span className={`display text-5xl md:text-[56px] leading-none ${a.numCol}`} dir="ltr">
+        <span className="display text-5xl md:text-[56px] leading-none text-ink" dir="ltr">
           {value}
         </span>
         {suffix && (
@@ -100,11 +108,12 @@ export default function Dashboard() {
         />
 
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-12">
-          <StatBlock accent="petrol" eyebrow="סך הכל" value={stats.total} note="מועמדים בפנקס" />
-          <StatBlock accent="ochre" eyebrow="ממתינים" value={stats.pending} note="טרם הגישו תשובות" />
-          <StatBlock accent="forest" eyebrow="הושלמו" value={stats.completed} note="זמינים לקריאה" />
+          <StatBlock accent="petrol" icon={Users} eyebrow="סך הכל" value={stats.total} note="מועמדים בפנקס" />
+          <StatBlock accent="ochre" icon={Clock} eyebrow="ממתינים" value={stats.pending} note="טרם הגישו תשובות" />
+          <StatBlock accent="forest" icon={CheckCircle2} eyebrow="הושלמו" value={stats.completed} note="זמינים לקריאה" />
           <StatBlock
             accent="brick"
+            icon={TrendingUp}
             eyebrow="ממוצע התאמה"
             value={stats.avgFit || '—'}
             suffix={stats.avgFit ? '%' : ''}

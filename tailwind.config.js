@@ -53,6 +53,18 @@ export default {
           ghost: '#F1E0E0',
           tint: '#F8ECEC',
         },
+        indigo: {
+          DEFAULT: '#3D4F7A',
+          soft: '#5468A0',
+          ghost: '#DDE2EE',
+          tint: '#EAEEF6',
+        },
+        plum: {
+          DEFAULT: '#6E3D5C',
+          soft: '#8D5278',
+          ghost: '#EFE0E8',
+          tint: '#F5EBF0',
+        },
       },
       letterSpacing: {
         widish: '0.08em',

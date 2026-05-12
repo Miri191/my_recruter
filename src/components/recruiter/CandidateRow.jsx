@@ -38,11 +38,11 @@ export default function CandidateRow({ candidate, index, onDelete }) {
 
   return (
     <tr
-      className="border-b border-ink-line/70 hover:bg-paper-dark/40 transition-colors cursor-pointer group"
+      className={`border-b border-ink-line/70 hover:bg-paper-dark/60 transition-colors cursor-pointer group ${completed ? '' : ''}`}
       onClick={goTo}
     >
       <td className="py-5 pr-3 align-middle relative">
-        <span className={`absolute right-0 top-2 bottom-2 w-[3px] ${stripeColor} opacity-0 group-hover:opacity-100 transition-opacity`} />
+        <span className={`absolute right-0 top-2 bottom-2 w-[3px] ${stripeColor} opacity-60 group-hover:opacity-100 transition-opacity`} />
         <div className="num text-[11px] tracking-widish text-ink-mute pl-2">{n}</div>
       </td>
       <td className="py-5 px-4 align-middle">

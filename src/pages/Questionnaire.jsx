@@ -77,10 +77,10 @@ function QuestionScreen({ index, answer, onAnswer, onPrev, onNext, total }) {
     <div className="min-h-screen md:min-h-[760px] flex flex-col bg-paper-light">
       <div className="sticky top-0 z-10 bg-paper-light/95 backdrop-blur-sm px-7 md:px-9 pt-5 pb-4 border-b border-ink-line">
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-petrol" />
-            <span className="eyebrow-petrol">{dim.key} · {dim.name}</span>
-          </div>
+          <span className={`inline-flex items-center gap-1.5 border font-semibold uppercase text-[10px] tracking-wider2 px-2 py-[3px] ${dim.classes.bgGhost} ${dim.classes.text} ${dim.classes.borderSoft}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${dim.classes.dot}`} />
+            {dim.key} · {dim.name}
+          </span>
           <span className="num text-[12px] tracking-widish text-ink-mute" dir="ltr">
             {num} / {total}
           </span>
