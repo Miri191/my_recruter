@@ -260,7 +260,7 @@ export default function Report() {
           back
           backTo="/"
           action={
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 no-print">
               <button
                 type="button"
                 onClick={() => setHistoryOpen(true)}
@@ -274,11 +274,9 @@ export default function Report() {
                 </span>
               </button>
               <Button
-                variant="secondary"
-                onClick={() => {
-                  console.log('PDF export — coming soon', { candidate, scores, fit });
-                  alert('יצוא PDF — בקרוב');
-                }}
+                variant="primary"
+                onClick={() => window.print()}
+                title="הדפסה / שמירה כ-PDF"
               >
                 הורד PDF ↓
               </Button>
@@ -286,14 +284,38 @@ export default function Report() {
           }
         />
 
-        <AnalysisControls
-          layers={layers}
-          onToggleLayer={toggleLayer}
-          depth={depth}
-          onDepthChange={setDepth}
-          sector={sector}
-          onSectorChange={setSector}
-        />
+        <div className="no-print">
+          <AnalysisControls
+            layers={layers}
+            onToggleLayer={toggleLayer}
+            depth={depth}
+            onDepthChange={setDepth}
+            sector={sector}
+            onSectorChange={setSector}
+          />
+        </div>
+
+        {/* Print-only summary banner — shows current view settings in PDF */}
+        <div className="print-only hidden mb-6 pb-3 border-b border-ink-line text-[10pt]">
+          <div className="flex items-baseline justify-between mb-1">
+            <span className="font-semibold">דוח Persona · אבחון אישיותי</span>
+            <span dir="ltr">
+              {new Date().toLocaleDateString('he-IL', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </span>
+          </div>
+          <div className="text-[9pt] text-ink-mute">
+            עומק תובנות: {depth === 'shallow' ? 'קצר' : depth === 'deep' ? 'עומק' : 'בינוני'}
+            {' · '}
+            שכבות: {layers.join(', ')}
+            {sector === 'regulated' ? ' · מצב סקטור מפוקח' : ''}
+          </div>
+        </div>
 
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12 items-stretch">
           <div className="lg:col-span-5 flex flex-col">

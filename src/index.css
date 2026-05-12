@@ -133,3 +133,87 @@
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
 }
+
+/* ============================================================
+   PRINT — turns the report into a clean A4 PDF
+   ============================================================ */
+@page {
+  size: A4;
+  margin: 14mm 12mm;
+}
+
+@media print {
+  /* Force background colors to print (Chrome/Safari default-strip them) */
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  html, body {
+    background: #FFFFFF !important;
+  }
+
+  body {
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  main {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Hide screen-only UI chrome */
+  .no-print,
+  aside {
+    display: none !important;
+  }
+
+  /* Show print-only blocks */
+  .print-only {
+    display: block !important;
+  }
+
+  /* Tighten sections for paper */
+  section, article {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  h1, h2, h3 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  /* Avoid orphan headings — keep with content */
+  header {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  /* Hover/transition effects off for print */
+  * {
+    transition: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  /* Restore selective shadows that improve the printed look */
+  .card-elev,
+  .bg-paper-light {
+    box-shadow: none !important;
+    border: 1px solid #D8D3C8 !important;
+  }
+
+  /* Links: show URL inline for traceability */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #7B7264;
+  }
+}

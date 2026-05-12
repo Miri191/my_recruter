@@ -11,7 +11,7 @@ export default function PageHeader({ eyebrow, title, subtitle, action, back = fa
             <button
               type="button"
               onClick={() => (backTo ? navigate(backTo) : navigate(-1))}
-              className="eyebrow-petrol hover:underline-petrol transition-colors mb-3 inline-flex items-center gap-2 font-medium"
+              className="eyebrow-petrol hover:underline-petrol transition-colors mb-3 inline-flex items-center gap-2 font-medium no-print"
             >
               <span className="text-base leading-none">→</span>
               חזרה
