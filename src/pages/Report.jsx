@@ -246,7 +246,7 @@ export default function Report() {
       <Sidebar />
       <main className="flex-1 px-6 md:px-12 py-8 md:py-14 max-w-6xl mx-auto w-full">
         <PageHeader
-          eyebrow={`גליון אישי · הוגש ב־${completedDate}`}
+          eyebrow={`דוח אישי · הוגש ב־${completedDate}`}
           title={candidate.name}
           subtitle={
             <span className="flex items-center gap-4 flex-wrap text-sm text-ink-soft">
@@ -298,7 +298,7 @@ export default function Report() {
         {/* Print-only summary banner — shows current view settings in PDF */}
         <div className="print-only hidden mb-6 pb-3 border-b border-ink-line text-[10pt]">
           <div className="flex items-baseline justify-between mb-1">
-            <span className="font-semibold">דוח Persona · אבחון אישיותי</span>
+            <span className="font-semibold"><span dir="ltr">Persona</span> · דוח אישיותי</span>
             <span dir="ltr">
               {new Date().toLocaleDateString('he-IL', {
                 day: '2-digit',
@@ -329,7 +329,6 @@ export default function Report() {
           <Card variant="elev" padding="p-6" className="lg:col-span-7">
             <div className="flex items-baseline justify-between mb-3">
               <div>
-                <div className="eyebrow-petrol mb-1">פרק I</div>
                 <h2 className="display text-2xl text-ink">פרופיל אישיות</h2>
               </div>
               <div className="flex items-center gap-4 text-[11px] uppercase tracking-widish">
@@ -398,7 +397,6 @@ export default function Report() {
 
         <Card variant="elev" padding="p-7 md:p-8" className="mb-12">
           <div className="flex items-baseline gap-4 mb-5">
-            <span className="num text-[11px] tracking-widish text-petrol font-medium">II</span>
             <h2 className="display text-2xl text-ink">פירוט לפי ממדים</h2>
             <div className="flex-1 rule h-px" />
           </div>
@@ -429,7 +427,6 @@ export default function Report() {
         )}
 
         <header className="flex items-baseline gap-4 mb-5">
-          <span className="num text-[11px] tracking-widish text-petrol font-semibold">D</span>
           <h2 className="display text-2xl text-ink">סיכום והמלצות</h2>
           <div className="flex-1 rule h-px" />
         </header>
@@ -438,7 +435,7 @@ export default function Report() {
           <Card variant="elev" accent="forest" padding="p-6">
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-forest" />
-              <div className="eyebrow text-forest font-semibold">פרק III · א</div>
+              <div className="eyebrow text-forest font-semibold">מה בולט לטובה</div>
             </div>
             <h3 className="display text-2xl text-ink mb-2">חוזקות</h3>
             <div className="rule mb-5" />
@@ -472,7 +469,7 @@ export default function Report() {
           <Card variant="elev" accent="ochre" padding="p-6">
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-ochre" />
-              <div className="eyebrow text-ochre font-semibold">פרק III · ב</div>
+              <div className="eyebrow text-ochre font-semibold">לבדוק בראיון</div>
             </div>
             <h3 className="display text-2xl text-ink mb-2">נקודות לתשומת לב</h3>
             <div className="rule mb-5" />
@@ -506,7 +503,7 @@ export default function Report() {
           <Card variant="elev" accent="petrol" padding="p-6">
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-petrol" />
-              <div className="eyebrow-petrol">פרק III · ג</div>
+              <div className="eyebrow-petrol">לשאול בראיון</div>
             </div>
             <h3 className="display text-2xl text-ink mb-2">שאלות לראיון</h3>
             <div className="rule mb-5" />
@@ -539,9 +536,9 @@ export default function Report() {
         </section>
 
         <footer className="border-t-2 border-ink pt-6 flex items-baseline justify-between text-[11px] tracking-widish uppercase text-ink-mute">
-          <span><span dir="ltr">Persona</span> · אבחון אישיות</span>
+          <span><span dir="ltr">Persona</span> · אבחון אישיותי</span>
           <span className="num" dir="ltr">№ {id?.slice(0, 8).toUpperCase()}</span>
-          <span>BIG5 · IPIP 50</span>
+          <span>BIG5 · IPIP-50</span>
         </footer>
       </main>
 

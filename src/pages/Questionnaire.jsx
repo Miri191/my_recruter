@@ -15,14 +15,13 @@ function WelcomeScreen({ candidate, role, onStart }) {
       <div className="flex items-baseline justify-between mb-10">
         <div className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-petrol" />
-          <span className="eyebrow-petrol">פנקס אישיות</span>
+          <span className="eyebrow-petrol">שאלון אישיותי</span>
         </div>
-        <div className="eyebrow num">N° 01</div>
+        <div className="eyebrow num" dir="ltr">Persona</div>
       </div>
 
       <div className="flex-1 flex flex-col">
         <div className="mb-6">
-          <div className="eyebrow-petrol mb-3">פתח דבר</div>
           <div className="rule-petrol mb-5" />
           <h1 className="display text-[44px] md:text-[52px] text-ink leading-[1.05] text-balance">
             שלום,<br/>
@@ -56,10 +55,10 @@ function WelcomeScreen({ candidate, role, onStart }) {
           </div>
 
           <Button onClick={onStart} size="xl" fullWidth>
-            פתחי את הפנקס ←
+            בואו נתחיל ←
           </Button>
           <div className="eyebrow text-center mt-4 text-ink-mute">
-            BIG5 · International Personality Item Pool
+            מבוסס על שאלון BIG5
           </div>
         </div>
       </div>

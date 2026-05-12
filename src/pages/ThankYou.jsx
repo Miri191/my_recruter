@@ -15,14 +15,13 @@ export default function ThankYou() {
         <div className="flex items-baseline justify-between mb-12">
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-forest" />
-            <span className="eyebrow text-forest font-semibold">פנקס · סיום</span>
+            <span className="eyebrow text-forest font-semibold">סיימת!</span>
           </div>
-          <div className="eyebrow num">Fin.</div>
+          <div className="eyebrow num" dir="ltr">Persona</div>
         </div>
 
         <div className="flex-1 flex flex-col">
           <div className="mb-8">
-            <div className="eyebrow-petrol mb-3">פיסה</div>
             <div className="rule-petrol mb-6" />
             <h1 className="display text-[52px] md:text-[64px] text-ink leading-[0.95] text-balance">
               תודה{firstName ? `,` : '.'}<br/>
@@ -33,8 +32,8 @@ export default function ThankYou() {
           </div>
 
           <p className="text-[16px] text-ink-soft leading-relaxed mb-3 text-balance">
-            סיימת את השאלון בהצלחה. התשובות עברו לטיפול המגייסת —
-            ניצור איתך קשר בקרוב להמשך התהליך.
+            סיימת בהצלחה. התשובות שלך עברו למגייסת —
+            נחזור אלייך בקרוב להמשך התהליך.
           </p>
 
           <div className="mt-auto pt-10">

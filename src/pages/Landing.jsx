@@ -101,16 +101,16 @@ export default function Landing() {
           <div>
             <div className="flex items-center gap-2 mb-5">
               <span className="w-1.5 h-1.5 rounded-full bg-petrol" />
-              <span className="eyebrow-petrol">Persona — Edition 01</span>
+              <span className="eyebrow-petrol">כלי גיוס חכם</span>
             </div>
             <h1 className="display text-5xl md:text-6xl lg:text-7xl text-ink leading-[1.05] text-balance mb-6">
-              אבחני את האישיות{' '}
-              <span className="underline-petrol">לפני</span>{' '}
-              שאת חותמת על חוזה.
+              איך באמת את יודעת{' '}
+              <span className="underline-petrol">מי</span>{' '}
+              עומדת מולך?
             </h1>
             <p className="text-[17px] md:text-[19px] text-ink-soft leading-relaxed mb-8 max-w-xl text-balance">
-              פלטפורמת אבחון BIG5 בעברית — מקצרת ראיונות, מצמצמת טעויות גיוס,
-              ומפיקה דוח התאמה מקצועי לכל מועמד תוך דקות.
+              קורות חיים מספרים מה היא עשתה. ראיונות מספרים מה היא רוצה שתחשבי.
+              Persona מראה לך מי היא באמת — לפני שאת מקבלת החלטה.
             </p>
             <div className="flex flex-wrap items-center gap-4">
               <CTAButton onClick={goToApp} size="xl">
@@ -204,11 +204,91 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ===== Problem / Solution ===== */}
+      <section className="border-y-2 border-ink py-20">
+        <div className="max-w-6xl mx-auto px-6 md:px-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+            <div>
+              <div className="eyebrow text-oxblood font-semibold mb-3">הבעיה</div>
+              <h2 className="display text-3xl md:text-4xl text-ink mb-6 leading-tight text-balance">
+                90% מהחלטות הגיוס מבוססות על תחושת בטן.
+              </h2>
+              <ul className="space-y-4 text-[15px] text-ink-soft leading-relaxed">
+                <li className="flex gap-3">
+                  <span className="text-oxblood shrink-0 mt-1">·</span>
+                  <span>
+                    <strong className="text-ink font-medium">קו"חים מוטים.</strong>{' '}
+                    מי שיודע לכתוב טוב יותר זוכה להזדמנות — לא בהכרח מי שמתאים לתפקיד.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-oxblood shrink-0 mt-1">·</span>
+                  <span>
+                    <strong className="text-ink font-medium">ראיונות מטעים.</strong>{' '}
+                    מועמדים מציגים מה שהם חושבים שאת רוצה לשמוע — לא איך הם באמת יעבדו.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-oxblood shrink-0 mt-1">·</span>
+                  <span>
+                    <strong className="text-ink font-medium">טעות גיוס יקרה.</strong>{' '}
+                    החלפת עובד עולה 50%–200% מהשכר השנתי שלו, ומשפיעה על כל הצוות.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-oxblood shrink-0 mt-1">·</span>
+                  <span>
+                    <strong className="text-ink font-medium">העבר לא תמיד מנבא.</strong>{' '}
+                    מועמדת מצוינת בתפקיד קודם — לא בהכרח מתאימה לתפקיד שלך.
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <div className="eyebrow text-forest font-semibold mb-3">המענה שלנו</div>
+              <h2 className="display text-3xl md:text-4xl text-ink mb-6 leading-tight text-balance">
+                שכבת נתונים אובייקטיבית, לפני הראיון.
+              </h2>
+              <ul className="space-y-4 text-[15px] text-ink-soft leading-relaxed">
+                <li className="flex gap-3">
+                  <span className="text-forest shrink-0 mt-1">✓</span>
+                  <span>
+                    <strong className="text-ink font-medium">שאלון מאומת מדעית.</strong>{' '}
+                    BIG5 — המודל הנפוץ בעולם להערכת אישיות מקצועית, על בסיס עשורים של מחקר.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-forest shrink-0 mt-1">✓</span>
+                  <span>
+                    <strong className="text-ink font-medium">5 דקות מהמועמד.</strong>{' '}
+                    שאלון קצר במובייל — לא דורש זמן יקר ממך או מהמועמד.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-forest shrink-0 mt-1">✓</span>
+                  <span>
+                    <strong className="text-ink font-medium">ציון התאמה ברור לתפקיד.</strong>{' '}
+                    משוקלל לפי מה שחשוב לתפקיד הספציפי — לא ציון גנרי.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-forest shrink-0 mt-1">✓</span>
+                  <span>
+                    <strong className="text-ink font-medium">שאלות מותאמות לראיון.</strong>{' '}
+                    הדוח מציע לך בדיוק מה לשאול — איך לאמת או להפריך את התובנות לפני שאת מחליטה.
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ===== How it works ===== */}
-      <section id="how-it-works" className="bg-paper-light border-y-2 border-ink py-20">
+      <section id="how-it-works" className="bg-paper-light border-b-2 border-ink py-20">
         <div className="max-w-6xl mx-auto px-6 md:px-10">
           <div className="flex items-baseline gap-4 mb-12">
-            <span className="num text-[11px] tracking-widish text-petrol font-semibold">פרק I</span>
             <h2 className="display text-3xl md:text-4xl text-ink">איך זה עובד</h2>
             <div className="flex-1 rule-petrol h-px" />
           </div>
@@ -219,22 +299,22 @@ export default function Landing() {
                 n: '01',
                 icon: ClipboardList,
                 color: 'petrol',
-                title: 'יצירת הזמנה',
-                desc: 'בוחרים תפקיד (6 מובנים + יצירת מותאמים), ממלאים פרטי מועמד, ומקבלים קישור אישי לשליחה.',
+                title: 'יוצרים מועמד',
+                desc: 'בוחרים תפקיד (6 מוכנים + אפשרות ליצור משלך), ממלאים פרטים — ומקבלים קישור אישי לשליחה.',
               },
               {
                 n: '02',
                 icon: Mail,
                 color: 'brick',
-                title: 'שליחה למועמד',
-                desc: 'הקישור עובר ב-WhatsApp, מייל או SMS. המועמד עונה ב-5 דקות במובייל — 50 שאלות BIG5 קצרות וברורות.',
+                title: 'שולחים למועמד',
+                desc: 'שולחים את הקישור ב-WhatsApp, מייל או SMS. המועמד עונה במובייל ב-5 דקות. אין צורך להוריד אפליקציה.',
               },
               {
                 n: '03',
                 icon: BarChart3,
                 color: 'forest',
-                title: 'קבלת דוח חכם',
-                desc: 'ציון התאמה משוקלל, פרופיל אישיות מול הנורמה, חוזקות וחששות, ושאלות מותאמות לראיון.',
+                title: 'מקבלים תמונה ברורה',
+                desc: 'ציון התאמה ברור, פרופיל אישיות, איפה הוא חזק ואיפה כדאי לבדוק, ושאלות מותאמות לראיון.',
               },
             ].map(({ n, icon: Icon, color, title, desc }) => {
               const colorMap = {
@@ -261,11 +341,11 @@ export default function Landing() {
       {/* ===== BIG5 dimensions ===== */}
       <section className="max-w-6xl mx-auto px-6 md:px-10 py-20">
         <div className="text-center mb-12">
-          <div className="eyebrow-petrol mb-3">המודל</div>
-          <h2 className="display text-3xl md:text-4xl text-ink mb-4">חמשת ממדי האישיות</h2>
+          <div className="eyebrow-petrol mb-3">מה אנחנו מודדים</div>
+          <h2 className="display text-3xl md:text-4xl text-ink mb-4">חמישה ממדים שמרכיבים אישיות</h2>
           <p className="text-[15px] text-ink-soft max-w-2xl mx-auto leading-relaxed">
-            מודל BIG5 הוא המסגרת הפסיכולוגית הנפוצה ביותר להערכת אישיות מקצועית, מאומתת
-            בעשרות שנות מחקר. כל מועמד נמדד על-פני 5 ממדים בלתי-תלויים.
+            BIG5 הוא המודל המוביל בעולם להערכת אישיות בעבודה. הוא מבוסס על עשורים של מחקר
+            ועל מאות אלפי משתתפים — וכל אדם מקבל ציון על-פני חמישה ממדים בלתי-תלויים.
           </p>
         </div>
 
@@ -292,7 +372,6 @@ export default function Landing() {
       <section className="bg-paper-light border-y-2 border-ink py-20">
         <div className="max-w-6xl mx-auto px-6 md:px-10">
           <div className="flex items-baseline gap-4 mb-12">
-            <span className="num text-[11px] tracking-widish text-petrol font-semibold">פרק II</span>
             <h2 className="display text-3xl md:text-4xl text-ink">מה תקבלי</h2>
             <div className="flex-1 rule-petrol h-px" />
           </div>
@@ -364,17 +443,17 @@ export default function Landing() {
       <section className="max-w-4xl mx-auto px-6 md:px-10 py-24 text-center">
         <div className="eyebrow-petrol mb-4">מוכנה לנסות?</div>
         <h2 className="display text-4xl md:text-5xl text-ink mb-5 text-balance">
-          התחילי לאבחן אישיות במקום לנחש.
+          תפסיקי לנחש. תתחילי לדעת.
         </h2>
         <p className="text-[16px] text-ink-soft mb-8 max-w-xl mx-auto leading-relaxed text-balance">
-          5 דקות להפיק קישור. 5 דקות למועמד למלא. דקה לקרוא דוח מקיף.
+          5 דקות ליצור קישור. 5 דקות למועמד למלא. דקה לראות תמונה ברורה.
         </p>
         <CTAButton onClick={goToApp} size="xl">
           כניסה למערכת
           <ArrowLeft size={16} />
         </CTAButton>
         <p className="text-[11px] text-ink-mute mt-4">
-          המערכת מוגנת בסיסמה. אם אין לך — פני אליי.
+          המערכת מוגנת בסיסמה.
         </p>
       </section>
 
@@ -389,7 +468,7 @@ export default function Landing() {
           <div className="flex items-center gap-6 text-[11px] tracking-widish uppercase text-ink-mute">
             <span>BIG5 · IPIP-50</span>
             <span>·</span>
-            <span>Edition 01 · 2026</span>
+            <span>2026</span>
           </div>
         </div>
       </footer>

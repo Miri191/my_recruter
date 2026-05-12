@@ -244,7 +244,7 @@ export default function Roles() {
       <main className="flex-1 px-6 md:px-12 py-8 md:py-14 max-w-[1400px] w-full mx-auto">
         <PageHeader
           title="ניהול תפקידים"
-          subtitle="עריכת פרופיל אישיותי אידיאלי לכל תפקיד, משקלות החישוב, ותכונות חשובות."
+          subtitle="כאן את עורכת את התפקידים — מי האישיות האידיאלית, מה משקל כל ממד בחישוב, ואיזה תכונות חשובות לך לתפקיד."
           action={
             <Button size="lg" onClick={openCreate}>
               + תפקיד חדש

@@ -6,7 +6,7 @@ export default function EmptyState({ icon, title, description, action }) {
           {icon}
         </div>
       )}
-      <div className="eyebrow-petrol mb-3">פנקס ריק</div>
+      <div className="eyebrow-petrol mb-3">אין מה להציג</div>
       {title && <h3 className="display text-2xl text-ink mb-2">{title}</h3>}
       <div className="rule-petrol mx-auto w-16 my-4" />
       {description && (

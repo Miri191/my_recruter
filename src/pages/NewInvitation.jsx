@@ -54,7 +54,7 @@ export default function NewInvitation() {
       email: form.email.trim(),
       phone: form.phone.trim(),
     });
-    showToast('המועמד נכתב לפנקס', 'success');
+    showToast('המועמד נוסף בהצלחה', 'success');
     setTimeout(() => navigate(`/link/${c.id}`), 150);
   };
 

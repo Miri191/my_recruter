@@ -19,11 +19,11 @@ export default function Sidebar() {
       <div className="px-8 pt-10 pb-8">
         <div className="flex items-baseline gap-2 mb-2">
           <span className="w-1.5 h-1.5 rounded-full bg-petrol" />
-          <div className="eyebrow-petrol">Recruiter — Edition 01</div>
+          <div className="eyebrow-petrol">פלטפורמת גיוס</div>
         </div>
         <div className="display text-3xl text-ink leading-none" dir="ltr">Persona</div>
         <div className="text-[13px] text-ink-soft mt-2 leading-snug">
-          פנקס אבחון אישיותי לקראת ראיון
+          אבחון אישיותי של מועמדים
         </div>
       </div>
 
@@ -65,7 +65,7 @@ export default function Sidebar() {
           <span className="text-[10px]">←</span>
         </button>
         <p className="text-[11px] text-ink-mute leading-relaxed mt-3">
-          הנתונים נשמרים מקומית בדפדפן בלבד.
+          הנתונים שלך נשמרים בדפדפן בלבד.
         </p>
       </div>
     </aside>

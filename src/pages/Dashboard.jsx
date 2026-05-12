@@ -100,9 +100,9 @@ export default function Dashboard() {
         />
 
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-12">
-          <StatBlock accent="petrol" icon={Users} eyebrow="סך הכל" value={stats.total} note="מועמדים בפנקס" />
-          <StatBlock accent="ochre" icon={Clock} eyebrow="ממתינים" value={stats.pending} note="טרם הגישו תשובות" />
-          <StatBlock accent="forest" icon={CheckCircle2} eyebrow="הושלמו" value={stats.completed} note="זמינים לקריאה" />
+          <StatBlock accent="petrol" icon={Users} eyebrow="סך הכל" value={stats.total} note="מועמדים במערכת" />
+          <StatBlock accent="ochre" icon={Clock} eyebrow="ממתינים" value={stats.pending} note="טרם מילאו שאלון" />
+          <StatBlock accent="forest" icon={CheckCircle2} eyebrow="הושלמו" value={stats.completed} note="דוח זמין" />
           <StatBlock
             accent="brick"
             icon={TrendingUp}
@@ -116,7 +116,6 @@ export default function Dashboard() {
         <section className="mb-6">
           <div className="flex items-baseline justify-between mb-4">
             <div>
-              <div className="eyebrow-petrol mb-2">פרק II · רשימה</div>
               <h2 className="display text-2xl text-ink">כל המועמדים</h2>
             </div>
             <div className="text-[12px] text-ink-mute">

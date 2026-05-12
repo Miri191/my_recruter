@@ -33,18 +33,18 @@ function LoginScreen({ onSuccess }) {
           </div>
           <div>
             <div className="display text-3xl text-ink leading-none" dir="ltr">Persona</div>
-            <div className="eyebrow-petrol mt-1">פנקס אבחון אישיותי</div>
+            <div className="eyebrow-petrol mt-1">אבחון אישיותי לגיוס</div>
           </div>
         </div>
 
         <div className="bg-paper-light border-2 border-ink shadow-petrol p-8 animate-fade-up">
           <div className="flex items-center gap-2 mb-2">
             <Lock size={14} className="text-petrol" />
-            <span className="eyebrow-petrol">כניסה למערכת</span>
+            <span className="eyebrow-petrol">כניסה</span>
           </div>
           <h1 className="display text-3xl text-ink mb-2">שלום</h1>
           <p className="text-[14px] text-ink-soft leading-relaxed mb-7">
-            המערכת מוגנת בסיסמה. הזיני אותה כדי להמשיך.
+            תצטרכי סיסמה כדי להמשיך.
           </p>
 
           <form onSubmit={handleSubmit}>
@@ -84,7 +84,7 @@ function LoginScreen({ onSuccess }) {
 
             {error && (
               <div className="mt-3 px-3 py-2 bg-oxblood-tint border border-oxblood/40 text-oxblood text-[13px]">
-                סיסמה שגויה. נסי שוב.
+                הסיסמה לא נכונה.
               </div>
             )}
 
@@ -101,8 +101,8 @@ function LoginScreen({ onSuccess }) {
         </div>
 
         <div className="text-center mt-6 text-[11px] text-ink-mute leading-relaxed">
-          הגנה זו מספקת חיכוך כנגד מבקרים מקריים, לא אבטחה מלאה.<br />
-          לאבטחה אמיתית של נתוני מועמדים — נדרש backend.
+          הסיסמה חוסמת ביקורים מקריים.<br />
+          לאבטחה מלאה של נתוני מועמדים נצטרך שרת.
         </div>
       </div>
     </div>
