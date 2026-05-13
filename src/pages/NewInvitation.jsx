@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Info } from 'lucide-react';
 import Sidebar from '../components/layout/Sidebar';
 import PageHeader from '../components/layout/Header';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import RoleCard from '../components/recruiter/RoleCard';
+import TierSelector, { AboutQuestionnairesModal } from '../components/recruiter/TierSelector';
 import { useApp } from '../context/AppContext';
+import { DEFAULT_TIER } from '../data/questionnaires';
 
 function Field({ label, hint, error, children }) {
   return (
@@ -24,9 +27,30 @@ export default function NewInvitation() {
   const navigate = useNavigate();
   const { createCandidate, showToast, roles } = useApp();
   const [roleId, setRoleId] = useState(null);
+  const [tier, setTier] = useState(DEFAULT_TIER);
+  const [tierUserOverride, setTierUserOverride] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', phone: '' });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const prevRoleRef = useRef(null);
+
+  // Auto-update tier when role changes — only if user hasn't manually overridden.
+  useEffect(() => {
+    if (!roleId) return;
+    if (prevRoleRef.current === roleId) return;
+    prevRoleRef.current = roleId;
+    if (tierUserOverride) return;
+    const role = roles.find((r) => r.id === roleId);
+    if (role?.recommendedTier) {
+      setTier(role.recommendedTier);
+    }
+  }, [roleId, roles, tierUserOverride]);
+
+  const handleTierChange = (newTier) => {
+    setTier(newTier);
+    setTierUserOverride(true);
+  };
 
   const setField = (k) => (e) => {
     setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -50,6 +74,7 @@ export default function NewInvitation() {
     setSubmitting(true);
     const c = createCandidate({
       roleId,
+      tier,
       name: form.name.trim(),
       email: form.email.trim(),
       phone: form.phone.trim(),
@@ -61,6 +86,8 @@ export default function NewInvitation() {
   const inputBase =
     'w-full h-11 px-3 bg-paper-light border-2 border-ink-line text-[15px] focus:outline-none focus:border-petrol transition-colors';
 
+  const selectedRole = roleId ? roles.find((r) => r.id === roleId) : null;
+
   return (
     <div className="flex min-h-screen">
       <Sidebar />
@@ -68,12 +95,13 @@ export default function NewInvitation() {
         <PageHeader
           eyebrow="הזמנה חדשה"
           title="מועמד חדש"
-          subtitle="ראשית — בחירת תפקיד. אחר־כך פרטי המועמד. בסוף — נפיק קישור אישי לשליחה."
+          subtitle="ראשית — בחירת תפקיד. אחר־כך סוג השאלון. בסוף — פרטי המועמד וקישור לשליחה."
           back
           backTo="/dashboard"
         />
 
         <form onSubmit={onSubmit}>
+          {/* Section 1: Role */}
           <Card variant="elev" padding="p-7 md:p-8" className="mb-6">
             <div className="flex items-baseline gap-4 mb-5">
               <span className="num text-[11px] tracking-widish text-petrol font-semibold">01</span>
@@ -97,9 +125,41 @@ export default function NewInvitation() {
             {errors.role && <p className="text-[12px] text-oxblood mt-3">{errors.role}</p>}
           </Card>
 
+          {/* Section 2: Questionnaire tier */}
           <Card variant="elev" padding="p-7 md:p-8" className="mb-6">
             <div className="flex items-baseline gap-4 mb-5">
               <span className="num text-[11px] tracking-widish text-petrol font-semibold">02</span>
+              <h2 className="display text-2xl text-ink">סוג השאלון</h2>
+              <div className="flex-1 rule h-px" />
+              <button
+                type="button"
+                onClick={() => setAboutOpen(true)}
+                className="inline-flex items-center gap-1.5 text-[11px] tracking-widish uppercase text-petrol hover:underline-petrol font-medium"
+                title="מה זה?"
+              >
+                <Info size={13} />
+                מה זה?
+              </button>
+            </div>
+
+            <TierSelector
+              tier={tier}
+              recommendedTier={selectedRole?.recommendedTier}
+              recommendedRoleName={selectedRole?.name}
+              onChange={handleTierChange}
+            />
+
+            {selectedRole?.tierRationale && tier === selectedRole.recommendedTier && (
+              <p className="text-[12px] text-ink-mute mt-3 leading-relaxed">
+                {selectedRole.tierRationale}
+              </p>
+            )}
+          </Card>
+
+          {/* Section 3: Candidate details */}
+          <Card variant="elev" padding="p-7 md:p-8" className="mb-6">
+            <div className="flex items-baseline gap-4 mb-5">
+              <span className="num text-[11px] tracking-widish text-petrol font-semibold">03</span>
               <h2 className="display text-2xl text-ink">פרטי המועמד</h2>
               <div className="flex-1 rule h-px" />
             </div>
@@ -151,6 +211,8 @@ export default function NewInvitation() {
             </Button>
           </div>
         </form>
+
+        {aboutOpen && <AboutQuestionnairesModal onClose={() => setAboutOpen(false)} />}
       </main>
     </div>
   );

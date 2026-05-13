@@ -1,5 +1,5 @@
 const KEY = 'recruiter_app_data';
-const VERSION = 1;
+const VERSION = 2; // bumped from 1 when adding tier support + new IPIP item IDs
 
 function emptyState() {
   return { version: VERSION, candidates: [] };
@@ -11,6 +11,9 @@ function readRaw() {
     if (!raw) return emptyState();
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== 'object') return emptyState();
+    // Schema bump — old data (v1, integer-keyed answers) is incompatible
+    // with the new tier-based questionnaires. Wipe and re-seed.
+    if (parsed.version !== VERSION) return emptyState();
     if (!Array.isArray(parsed.candidates)) parsed.candidates = [];
     return parsed;
   } catch {

@@ -8,7 +8,7 @@ import Card from '../components/ui/Card';
 import EmptyState from '../components/ui/EmptyState';
 import CandidateRow from '../components/recruiter/CandidateRow';
 import { useApp } from '../context/AppContext';
-import { questions } from '../data/questions';
+import { getTierItems } from '../data/questionnaires';
 import { calculateScores } from '../lib/scoring';
 import { calculateFit } from '../lib/fit';
 
@@ -61,8 +61,9 @@ export default function Dashboard() {
     if (completed.length) {
       const sum = completed.reduce((acc, c) => {
         const role = getRole(c.roleId);
-        const scores = calculateScores(c.answers, questions);
-        return acc + calculateFit(scores, role).fit;
+        const tierItems = getTierItems(c.tier || 'standard');
+        const { normalized } = calculateScores(c.answers, tierItems);
+        return acc + calculateFit(normalized, role).fit;
       }, 0);
       avgFit = Math.round(sum / completed.length);
     }

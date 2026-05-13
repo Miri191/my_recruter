@@ -3,12 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import MobileFrame from '../components/layout/MobileFrame';
 import ProgressBar from '../components/ui/ProgressBar';
 import Button from '../components/ui/Button';
-import { questions, likertLabels } from '../data/questions';
+import { getTierItems, getTierMeta, likertLabels } from '../data/questionnaires';
 import { dimensions } from '../data/dimensions';
 import { getRole } from '../data/roles';
 import { useApp } from '../context/AppContext';
 
-function WelcomeScreen({ candidate, role, onStart }) {
+function WelcomeScreen({ candidate, role, tierMeta, onStart }) {
   const firstName = candidate.name.split(' ')[0];
   return (
     <div className="min-h-screen md:min-h-[760px] flex flex-col p-7 md:p-9 bg-paper-light">
@@ -41,11 +41,11 @@ function WelcomeScreen({ candidate, role, onStart }) {
         <div className="mt-auto">
           <div className="grid grid-cols-3 gap-0 bg-paper-dark/30 border border-ink-line mb-8">
             <div className="py-4 pl-3 pr-3 border-l border-ink-line">
-              <div className="num display text-2xl text-petrol leading-none">50</div>
+              <div className="num display text-2xl text-petrol leading-none">{tierMeta.itemCount}</div>
               <div className="text-[11px] text-ink-mute mt-1.5">שאלות</div>
             </div>
             <div className="py-4 pl-3 pr-3 border-l border-ink-line">
-              <div className="num display text-2xl text-petrol leading-none">~5</div>
+              <div className="num display text-2xl text-petrol leading-none">~{tierMeta.estimatedMinutes}</div>
               <div className="text-[11px] text-ink-mute mt-1.5">דקות</div>
             </div>
             <div className="py-4 pl-3 pr-3">
@@ -58,7 +58,7 @@ function WelcomeScreen({ candidate, role, onStart }) {
             בואו נתחיל ←
           </Button>
           <div className="eyebrow text-center mt-4 text-ink-mute">
-            מבוסס על שאלון BIG5
+            מבוסס על שאלון BIG5 (IPIP)
           </div>
         </div>
       </div>
@@ -66,9 +66,10 @@ function WelcomeScreen({ candidate, role, onStart }) {
   );
 }
 
-function QuestionScreen({ index, answer, onAnswer, onPrev, onNext, total }) {
-  const q = questions[index];
-  const dim = dimensions[q.d === 'N' ? 'S' : q.d];
+function QuestionScreen({ items, index, answer, onAnswer, onPrev, onNext }) {
+  const total = items.length;
+  const item = items[index];
+  const dim = dimensions[item.dimension === 'N' ? 'S' : item.dimension];
   const progress = ((index + 1) / total) * 100;
   const num = String(index + 1).padStart(2, '0');
 
@@ -93,7 +94,7 @@ function QuestionScreen({ index, answer, onAnswer, onPrev, onNext, total }) {
             QUESTION № {num}
           </div>
           <h2 className="display text-[26px] md:text-[28px] text-ink leading-[1.25] text-balance">
-            {q.t}
+            {item.text}
           </h2>
         </div>
 
@@ -159,6 +160,9 @@ export default function Questionnaire() {
 
   const candidate = getCandidate(id);
   const role = candidate ? getRole(candidate.roleId) : null;
+  const tier = candidate?.tier || 'standard';
+  const tierItems = useMemo(() => getTierItems(tier), [tier]);
+  const tierMeta = useMemo(() => getTierMeta(tier), [tier]);
 
   const [started, setStarted] = useState(false);
   const [index, setIndex] = useState(0);
@@ -170,8 +174,11 @@ export default function Questionnaire() {
     }
   }, [ready, candidate, id, navigate]);
 
-  const total = questions.length;
-  const currentAnswer = useMemo(() => answers[questions[index].n], [answers, index]);
+  const total = tierItems.length;
+  const currentAnswer = useMemo(
+    () => answers[tierItems[index]?.id],
+    [answers, index, tierItems]
+  );
 
   if (!ready) return null;
 
@@ -189,8 +196,8 @@ export default function Questionnaire() {
   }
 
   const onAnswer = (v) => {
-    const qn = questions[index].n;
-    setAnswers((a) => ({ ...a, [qn]: v }));
+    const itemId = tierItems[index].id;
+    setAnswers((a) => ({ ...a, [itemId]: v }));
     if (index < total - 1) setTimeout(() => setIndex((i) => i + 1), 320);
   };
 
@@ -208,15 +215,20 @@ export default function Questionnaire() {
   return (
     <MobileFrame>
       {!started ? (
-        <WelcomeScreen candidate={candidate} role={role} onStart={() => setStarted(true)} />
+        <WelcomeScreen
+          candidate={candidate}
+          role={role}
+          tierMeta={tierMeta}
+          onStart={() => setStarted(true)}
+        />
       ) : (
         <QuestionScreen
+          items={tierItems}
           index={index}
           answer={currentAnswer}
           onAnswer={onAnswer}
           onPrev={onPrev}
           onNext={onNext}
-          total={total}
         />
       )}
     </MobileFrame>

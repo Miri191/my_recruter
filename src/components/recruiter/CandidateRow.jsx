@@ -3,7 +3,7 @@ import Badge from '../ui/Badge';
 import { getRole } from '../../data/roles';
 import { calculateScores } from '../../lib/scoring';
 import { calculateFit } from '../../lib/fit';
-import { questions } from '../../data/questions';
+import { getTierItems } from '../../data/questionnaires';
 
 function formatDate(iso) {
   if (!iso) return '—';
@@ -18,8 +18,9 @@ export default function CandidateRow({ candidate, index, onDelete }) {
 
   let fit = null;
   if (completed && candidate.answers) {
-    const scores = calculateScores(candidate.answers, questions);
-    fit = calculateFit(scores, role).fit;
+    const tierItems = getTierItems(candidate.tier || 'standard');
+    const { normalized } = calculateScores(candidate.answers, tierItems);
+    fit = calculateFit(normalized, role).fit;
   }
 
   const fitColor =

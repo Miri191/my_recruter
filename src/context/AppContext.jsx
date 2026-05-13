@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useReducer, useState, useCallback
 import { v4 as uuid } from 'uuid';
 import { loadAll, saveAll, upsertCustomRole, removeCustomRole } from '../lib/storage';
 import { getRoles, isDefaultRoleId } from '../data/roles';
+import { STANDARD_ITEMS } from '../data/questionnaires';
 
 const AppContext = createContext(null);
 
@@ -30,16 +31,33 @@ function reducer(state, action) {
   }
 }
 
+// Generate plausible answers for a target BIG5 profile (0-100 per dim).
+// Used to populate the seeded demo candidate so the report shows
+// meaningful data on first load.
+function generateDemoAnswers(targets) {
+  const answers = {};
+  STANDARD_ITEMS.forEach((item) => {
+    const dim = item.dimension === 'N' ? 'S' : item.dimension;
+    const target = targets[dim] ?? 50;
+    // Convert 0-100 target into a 1-5 scale value.
+    const v15 = Math.round((target / 100) * 4 + 1);
+    let answer;
+    if (item.dimension === 'N') {
+      // Scoring flips N → S, so for N+ items respond inversely to target.
+      answer = item.reverse ? v15 : 6 - v15;
+    } else {
+      answer = item.reverse ? 6 - v15 : v15;
+    }
+    answers[item.id] = Math.max(1, Math.min(5, answer));
+  });
+  return answers;
+}
+
 function seedIfEmpty(existing) {
   if (existing.length > 0) return existing;
   const now = new Date();
   const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
   const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
-
-  const completedAnswers = {};
-  for (let i = 1; i <= 50; i++) {
-    completedAnswers[i] = ((i * 7) % 5) + 1;
-  }
 
   return [
     {
@@ -48,10 +66,11 @@ function seedIfEmpty(existing) {
       email: 'miri@example.com',
       phone: '0501234567',
       roleId: 'pm',
+      tier: 'standard',
       status: 'completed',
       createdAt: twoDaysAgo.toISOString(),
       completedAt: dayAgo.toISOString(),
-      answers: completedAnswers,
+      answers: generateDemoAnswers({ E: 68, A: 72, C: 82, S: 82, O: 78 }),
     },
     {
       id: uuid(),
@@ -59,6 +78,7 @@ function seedIfEmpty(existing) {
       email: 'yossi@example.com',
       phone: '0529876543',
       roleId: 'sales',
+      tier: 'standard',
       status: 'pending',
       createdAt: dayAgo.toISOString(),
       completedAt: null,
@@ -70,6 +90,7 @@ function seedIfEmpty(existing) {
       email: 'dana@example.com',
       phone: '0547654321',
       roleId: 'designer',
+      tier: 'standard',
       status: 'pending',
       createdAt: now.toISOString(),
       completedAt: null,
@@ -97,13 +118,14 @@ export function AppProvider({ children }) {
     saveAll({ candidates: state.candidates });
   }, [state.candidates, state.ready]);
 
-  const createCandidate = useCallback(({ name, email, phone, roleId }) => {
+  const createCandidate = useCallback(({ name, email, phone, roleId, tier }) => {
     const c = {
       id: uuid(),
       name,
       email,
       phone,
       roleId,
+      tier: tier || 'standard',
       status: 'pending',
       createdAt: new Date().toISOString(),
       completedAt: null,

@@ -20,12 +20,13 @@ import AnalysisControls from '../components/report/AnalysisControls';
 import RedFlagsSection from '../components/report/RedFlagsSection';
 import WorkPatternsSection from '../components/report/WorkPatternsSection';
 import CultureFitSection from '../components/report/CultureFitSection';
+import FacetsSection from '../components/report/FacetsSection';
 import ViewHistoryModal from '../components/report/ViewHistoryModal';
 import { useApp } from '../context/AppContext';
 import { getRole } from '../data/roles';
-import { questions } from '../data/questions';
+import { getTierItems, getTierMeta } from '../data/questionnaires';
 import { dimensions, dimensionOrder } from '../data/dimensions';
-import { calculateScores } from '../lib/scoring';
+import { calculateScores, calculateFacetScores } from '../lib/scoring';
 import { calculateFit, fitLabel } from '../lib/fit';
 import { generateInsights } from '../lib/insights';
 import { generateAdvancedAnalysis } from '../lib/advancedAnalysis';
@@ -156,7 +157,12 @@ export default function Report() {
   const report = useMemo(() => {
     if (!candidate || !candidate.answers) return null;
     const role = getRole(candidate.roleId);
-    const scores = calculateScores(candidate.answers, questions);
+    const tier = candidate.tier || 'standard';
+    const tierItems = getTierItems(tier);
+    const tierMeta = getTierMeta(tier);
+    const { normalized: scores } = calculateScores(candidate.answers, tierItems);
+    const facets =
+      tier === 'deep' ? calculateFacetScores(candidate.answers, tierItems) : null;
     const { fit, dimFit } = calculateFit(scores, role);
     const insights = generateInsights(scores, role);
     const radarData = dimensionOrder.map((d) => ({
@@ -165,7 +171,7 @@ export default function Report() {
       ideal: role.ideal[d],
       fullMark: 100,
     }));
-    return { role, scores, fit, dimFit, insights, radarData };
+    return { role, tier, tierMeta, scores, facets, fit, dimFit, insights, radarData };
   }, [candidate]);
 
   // Advanced analysis — recomputes when scores/role/sector change. Other
@@ -232,7 +238,9 @@ export default function Report() {
     );
   }
 
-  const { role, scores, fit, insights, radarData } = report;
+  const { role, tier, tierMeta, scores, facets, fit, insights, radarData } = report;
+  const isQuick = tier === 'quick';
+  const isDeep = tier === 'deep';
   const completedDate = candidate.completedAt
     ? new Date(candidate.completedAt).toLocaleDateString('he-IL', {
         day: '2-digit',
@@ -284,16 +292,42 @@ export default function Report() {
           }
         />
 
-        <div className="no-print">
-          <AnalysisControls
-            layers={layers}
-            onToggleLayer={toggleLayer}
-            depth={depth}
-            onDepthChange={setDepth}
-            sector={sector}
-            onSectorChange={setSector}
-          />
+        {/* Tier indicator — shows which questionnaire the candidate filled */}
+        <div className="mb-6 flex items-center gap-3 bg-paper-light border border-ink-line px-4 py-3">
+          <span className={`inline-flex items-center gap-1.5 border px-2 py-0.5 text-[10px] tracking-wider2 uppercase font-semibold ${
+            isQuick ? 'border-forest/40 text-forest bg-forest-tint'
+              : isDeep ? 'border-plum/40 text-plum bg-plum-tint'
+              : 'border-petrol/40 text-petrol bg-petrol-tint'
+          }`}>
+            שאלון {tierMeta.name}
+          </span>
+          <span className="num text-[12px] text-ink-soft" dir="ltr">
+            {tierMeta.itemCount} שאלות · α = {tierMeta.validity.alphaRange} ({tierMeta.validity.label})
+          </span>
         </div>
+
+        {isQuick && (
+          <div className="mb-6 bg-ochre-tint border border-ochre/40 border-r-[4px] border-r-ochre p-4">
+            <div className="text-[13px] text-ochre leading-relaxed">
+              <span className="font-semibold">דוח זה מבוסס על שאלון מהיר.</span>{' '}
+              לניתוח עומק מלא (דגלים פונקציונליים, דפוסי עבודה, התאמה תרבותית) —
+              מומלץ להזמין את המועמד לשאלון סטנדרטי או מעמיק.
+            </div>
+          </div>
+        )}
+
+        {!isQuick && (
+          <div className="no-print">
+            <AnalysisControls
+              layers={layers}
+              onToggleLayer={toggleLayer}
+              depth={depth}
+              onDepthChange={setDepth}
+              sector={sector}
+              onSectorChange={setSector}
+            />
+          </div>
+        )}
 
         {/* Print-only summary banner — shows current view settings in PDF */}
         <div className="print-only hidden mb-6 pb-3 border-b border-ink-line text-[10pt]">
@@ -414,17 +448,19 @@ export default function Report() {
           </p>
         </Card>
 
-        {advanced && layers.includes('redflags') && (
+        {!isQuick && advanced && layers.includes('redflags') && (
           <RedFlagsSection flags={advanced.redflags} depth={depth} />
         )}
 
-        {advanced && layers.includes('patterns') && advanced.patterns && (
+        {!isQuick && advanced && layers.includes('patterns') && advanced.patterns && (
           <WorkPatternsSection patterns={advanced.patterns} depth={depth} />
         )}
 
-        {advanced && layers.includes('culture') && (
+        {!isQuick && advanced && layers.includes('culture') && (
           <CultureFitSection culture={advanced.culture} depth={depth} />
         )}
+
+        {isDeep && facets && <FacetsSection facets={facets} />}
 
         <header className="flex items-baseline gap-4 mb-5">
           <h2 className="display text-2xl text-ink">סיכום והמלצות</h2>
@@ -540,14 +576,21 @@ export default function Report() {
           <div className="text-[12px] text-ink-soft leading-relaxed max-w-3xl">
             <p className="mb-2">
               חמשת הציונים BIG5 מחושבים על פי{' '}
-              <span className="font-medium text-ink">IPIP-50 (Goldberg 1992)</span> —
-              שאלון מאומת מדעית של ה-International Personality Item Pool, שמשמש בעשורים
-              האחרונים במחקרים פסיכולוגיים, ארגוניים, וקליניים ברחבי העולם.
+              <span className="font-medium text-ink">
+                {isDeep ? 'IPIP-NEO-120 (Johnson 2014)' : 'IPIP-50 (Goldberg 1992)'}
+              </span>{' '}
+              — שאלון מאומת מדעית של ה-International Personality Item Pool,
+              שמשמש בעשורים האחרונים במחקרים פסיכולוגיים, ארגוניים, וקליניים
+              ברחבי העולם.
             </p>
-            <p className="text-ink-mute">
-              ציון התאמה לתפקיד, פירוט החוזקות, הדגלים, דפוסי העבודה, וההתאמה התרבותית —
-              אלו שכבות פרשנות שנבנו מעל הציונים על-פי ספרות מחקרית רלוונטית, ואינן חלק
-              מ-IPIP עצמה.
+            <p className="mb-2 text-ink-mute">
+              ציון התאמה לתפקיד, פירוט החוזקות, הדגלים, דפוסי העבודה, וההתאמה
+              התרבותית — אלו שכבות פרשנות שנבנו מעל הציונים על-פי ספרות מחקרית
+              רלוונטית, ואינן חלק מ-IPIP עצמה.
+            </p>
+            <p className="text-ink-mute text-[11px]">
+              השאלונים מבוססים על International Personality Item Pool (IPIP)
+              בנחלת הכלל. התרגום העברי על ידי ד״ר שאול אורג, אוניברסיטת בן־גוריון.
             </p>
           </div>
         </section>
