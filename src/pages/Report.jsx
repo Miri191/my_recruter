@@ -349,13 +349,6 @@ export default function Report() {
           </div>
         )}
 
-        <RoleComparisonStrip
-          rolesData={rolesData}
-          activeRoleId={activeRoleId}
-          assignedRoleId={candidate.roleId}
-          onSelect={setActiveRoleId}
-        />
-
         {!isQuick && (
           <div className="no-print">
             <AnalysisControls
@@ -610,6 +603,13 @@ export default function Report() {
             )}
           </Card>
         </section>
+
+        <RoleComparisonStrip
+          rolesData={rolesData}
+          activeRoleId={activeRoleId}
+          assignedRoleId={candidate.roleId}
+          onSelect={setActiveRoleId}
+        />
 
         <section className="border-t border-ink-line pt-6 mb-6">
           <div className="eyebrow-petrol mb-2">מתודולוגיה</div>
