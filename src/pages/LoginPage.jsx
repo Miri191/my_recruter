@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import AuthShell, { AuthInput, AuthError } from '../components/auth/AuthShell';
@@ -20,11 +20,19 @@ function translateAuthError(message) {
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, isSupabaseEnabled } = useAuth();
+  const { signIn, isSupabaseEnabled, isAuthenticated } = useAuth();
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // Navigate to dashboard once authenticated
+  useEffect(() => {
+    if (isAuthenticated && !loading) {
+      const next = location.state?.from?.pathname || '/dashboard';
+      navigate(next, { replace: true });
+    }
+  }, [isAuthenticated, loading, navigate, location.state?.from?.pathname]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -32,8 +40,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await signIn(form.email.trim(), form.password);
-      // Don't reset loading here — let auth state changes trigger redirect
-      // Loading will be handled by ProtectedRoute after auth state updates
+      // Auth state change will trigger useEffect above to redirect
     } catch (err) {
       setError(translateAuthError(err.message));
       setLoading(false);
