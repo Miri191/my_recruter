@@ -297,7 +297,24 @@ export default function Landing() {
       </header>
 
       {/* ===== Hero ===== */}
-      <section className="max-w-6xl mx-auto px-6 md:px-10 pt-16 md:pt-24 pb-16">
+      <section className="relative overflow-hidden">
+        {/* Decorative background — soft color blobs + dot grid */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-32 -right-40 w-[32rem] h-[32rem] rounded-full bg-petrol/15 blur-3xl" />
+          <div className="absolute top-1/2 -left-40 w-[28rem] h-[28rem] rounded-full bg-brick/15 blur-3xl" />
+          <div className="absolute -bottom-24 right-1/3 w-80 h-80 rounded-full bg-plum/10 blur-3xl" />
+          <div
+            className="absolute inset-0 opacity-60"
+            style={{
+              backgroundImage:
+                'radial-gradient(circle at 1px 1px, rgba(27,23,20,0.05) 1px, transparent 0)',
+              backgroundSize: '22px 22px',
+            }}
+          />
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-paper to-transparent" />
+        </div>
+
+        <div className="relative max-w-6xl mx-auto px-6 md:px-10 pt-16 md:pt-24 pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-16 items-center">
           <div>
             <div className="flex items-center gap-2 mb-5">
@@ -404,6 +421,7 @@ export default function Landing() {
               <div className="display text-lg leading-none mt-1">דגלים, דפוסים, תרבות</div>
             </div>
           </div>
+        </div>
         </div>
       </section>
 
