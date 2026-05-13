@@ -305,9 +305,11 @@ export default function Landing() {
               <span className="eyebrow-petrol">כלי גיוס חכם</span>
             </div>
             <h1 className="display text-5xl md:text-6xl lg:text-7xl text-ink leading-[1.05] text-balance mb-6">
-              לפני שאת מזמינה לראיון —{' '}
-              <span className="text-petrol">הכירי</span>{' '}
-              אותה קודם.
+              <span className="text-petrol" dir="ltr">Persona</span>
+              <br />
+              להכיר את המועמדים שלך
+              <br />
+              לפני הראיון.
             </h1>
             <p className="text-[17px] md:text-[19px] text-ink-soft leading-relaxed mb-8 max-w-xl text-balance">
               קורות חיים מספרים מה היא עשתה. ראיונות מספרים מה היא רוצה שתחשבי.
