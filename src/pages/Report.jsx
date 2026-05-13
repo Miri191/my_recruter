@@ -22,12 +22,13 @@ import WorkPatternsSection from '../components/report/WorkPatternsSection';
 import CultureFitSection from '../components/report/CultureFitSection';
 import FacetsSection from '../components/report/FacetsSection';
 import RoleComparisonStrip from '../components/report/RoleComparisonStrip';
+import ConsistencyAlert from '../components/report/ConsistencyAlert';
 import ViewHistoryModal from '../components/report/ViewHistoryModal';
 import { useApp } from '../context/AppContext';
 import { getRole } from '../data/roles';
 import { getTierItems, getTierMeta } from '../data/questionnaires';
 import { dimensions, dimensionOrder } from '../data/dimensions';
-import { calculateScores, calculateFacetScores } from '../lib/scoring';
+import { calculateScores, calculateFacetScores, calculateConsistency } from '../lib/scoring';
 import { calculateFit, fitLabel } from '../lib/fit';
 import { generateInsights } from '../lib/insights';
 import { generateAdvancedAnalysis } from '../lib/advancedAnalysis';
@@ -163,7 +164,8 @@ export default function Report() {
     );
   };
 
-  // Candidate-intrinsic data (independent of role): 5 dim scores + facets.
+  // Candidate-intrinsic data (independent of role): 5 dim scores + facets
+  // + response consistency.
   const candidateScores = useMemo(() => {
     if (!candidate || !candidate.answers) return null;
     const tier = candidate.tier || 'standard';
@@ -172,7 +174,8 @@ export default function Report() {
     const { normalized: scores } = calculateScores(candidate.answers, tierItems);
     const facets =
       tier === 'deep' ? calculateFacetScores(candidate.answers, tierItems) : null;
-    return { tier, tierMeta, scores, facets };
+    const consistency = calculateConsistency(candidate.answers, tierItems);
+    return { tier, tierMeta, scores, facets, consistency };
   }, [candidate]);
 
   // Fit per role — used by the comparison strip. Cheap to compute.
@@ -195,7 +198,7 @@ export default function Report() {
   // Role-dependent computations: fit, insights, radar.
   const report = useMemo(() => {
     if (!candidateScores || !activeRole) return null;
-    const { scores, facets, tier, tierMeta } = candidateScores;
+    const { scores, facets, tier, tierMeta, consistency } = candidateScores;
     const { fit, dimFit } = calculateFit(scores, activeRole);
     const insights = generateInsights(scores, activeRole);
     const radarData = dimensionOrder.map((d) => ({
@@ -204,7 +207,7 @@ export default function Report() {
       ideal: activeRole.ideal[d],
       fullMark: 100,
     }));
-    return { role: activeRole, tier, tierMeta, scores, facets, fit, dimFit, insights, radarData };
+    return { role: activeRole, tier, tierMeta, scores, facets, consistency, fit, dimFit, insights, radarData };
   }, [candidateScores, activeRole]);
 
   // Advanced analysis — recomputes when scores/role/sector change. Other
@@ -271,7 +274,7 @@ export default function Report() {
     );
   }
 
-  const { role, tier, tierMeta, scores, facets, fit, insights, radarData } = report;
+  const { role, tier, tierMeta, scores, facets, consistency, fit, insights, radarData } = report;
   const isQuick = tier === 'quick';
   const isDeep = tier === 'deep';
   const completedDate = candidate.completedAt
@@ -338,6 +341,8 @@ export default function Report() {
             {tierMeta.itemCount} שאלות · α = {tierMeta.validity.alphaRange} ({tierMeta.validity.label})
           </span>
         </div>
+
+        <ConsistencyAlert consistency={consistency} />
 
         {isQuick && (
           <div className="mb-6 bg-ochre-tint border border-ochre/40 border-r-[4px] border-r-ochre p-4">

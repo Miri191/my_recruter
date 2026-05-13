@@ -97,3 +97,74 @@ export function calculateFacetScores(answers, tierItems) {
 
   return facetScores;
 }
+
+/**
+ * Response consistency check.
+ *
+ * For each pair of items in the same dimension where one is direct-keyed
+ * and the other reverse-keyed, a consistent respondent should produce
+ * responses that sum to ~6 (since direct + reverse means opposite phrasing
+ * of the same trait). E.g., answering 5 to "I love parties" should pair
+ * with 1 to "I prefer to be alone".
+ *
+ * Method: average |direct + reverse - 6| across all such pairs.
+ *  0    = perfectly consistent
+ *  ~1   = some noise / normal variation
+ *  ~2   = high inconsistency (random or contradictory)
+ *  ~3+  = highly contradictory (likely fake / unclear / unusual)
+ *
+ * Returned consistencyScore is 0-100 (higher = more consistent), and
+ * `level` classifies as 'consistent' | 'mild' | 'high'.
+ */
+export function calculateConsistency(answers, tierItems) {
+  const itemsByDim = {};
+  tierItems.forEach((item) => {
+    const response = answers?.[item.id];
+    if (response === undefined || response === null) return;
+    const dim = item.dimension;
+    if (!itemsByDim[dim]) itemsByDim[dim] = { direct: [], reverse: [] };
+    if (item.reverse) itemsByDim[dim].reverse.push(response);
+    else itemsByDim[dim].direct.push(response);
+  });
+
+  let totalDeviation = 0;
+  let totalPairs = 0;
+  const detailsByDim = {};
+
+  Object.entries(itemsByDim).forEach(([dim, { direct, reverse }]) => {
+    if (direct.length === 0 || reverse.length === 0) return;
+    let dimSum = 0;
+    let dimPairs = 0;
+    for (const d of direct) {
+      for (const r of reverse) {
+        dimSum += Math.abs(d + r - 6);
+        dimPairs += 1;
+      }
+    }
+    const reportDim = dim === 'N' ? 'S' : dim;
+    detailsByDim[reportDim] = +(dimSum / dimPairs).toFixed(2);
+    totalDeviation += dimSum;
+    totalPairs += dimPairs;
+  });
+
+  const avgInconsistency = totalPairs > 0 ? totalDeviation / totalPairs : 0;
+  // avgInconsistency ranges 0 (perfect) to ~4 (max contradiction).
+  // Convert to a 0-100 consistency score, higher = better.
+  const consistencyScore = Math.max(
+    0,
+    Math.min(100, Math.round(100 - (avgInconsistency / 4) * 100))
+  );
+
+  let level;
+  if (avgInconsistency < 1.0) level = 'consistent';
+  else if (avgInconsistency < 1.6) level = 'mild';
+  else level = 'high';
+
+  return {
+    level,
+    consistencyScore,
+    avgInconsistency: +avgInconsistency.toFixed(2),
+    detailsByDim,
+    pairsAnalyzed: totalPairs,
+  };
+}
