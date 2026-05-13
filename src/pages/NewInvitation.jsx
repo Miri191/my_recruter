@@ -68,19 +68,25 @@ export default function NewInvitation() {
     return Object.keys(e).length === 0;
   };
 
-  const onSubmit = (ev) => {
+  const onSubmit = async (ev) => {
     ev.preventDefault();
     if (!validate()) return;
     setSubmitting(true);
-    const c = createCandidate({
-      roleId,
-      tier,
-      name: form.name.trim(),
-      email: form.email.trim(),
-      phone: form.phone.trim(),
-    });
-    showToast('המועמד נוסף בהצלחה', 'success');
-    setTimeout(() => navigate(`/link/${c.id}`), 150);
+    try {
+      const c = await createCandidate({
+        roleId,
+        tier,
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+      });
+      showToast('המועמד נוסף בהצלחה', 'success');
+      setTimeout(() => navigate(`/link/${c.id}`), 150);
+    } catch (err) {
+      console.error('Failed to create candidate:', err);
+      showToast(err?.message || 'שגיאה ביצירת מועמד', 'error');
+      setSubmitting(false);
+    }
   };
 
   const inputBase =
