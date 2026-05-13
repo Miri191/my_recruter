@@ -21,6 +21,7 @@ import RedFlagsSection from '../components/report/RedFlagsSection';
 import WorkPatternsSection from '../components/report/WorkPatternsSection';
 import CultureFitSection from '../components/report/CultureFitSection';
 import FacetsSection from '../components/report/FacetsSection';
+import RoleComparisonStrip from '../components/report/RoleComparisonStrip';
 import ViewHistoryModal from '../components/report/ViewHistoryModal';
 import { useApp } from '../context/AppContext';
 import { getRole } from '../data/roles';
@@ -138,7 +139,7 @@ function FitDisplay({ fit }) {
 export default function Report() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getCandidate, ready } = useApp();
+  const { getCandidate, ready, roles } = useApp();
 
   const candidate = ready ? getCandidate(id) : null;
 
@@ -148,31 +149,63 @@ export default function Report() {
   const [sector, setSector] = useState('standard');
   const [historyOpen, setHistoryOpen] = useState(false);
 
+  // Role comparison — defaults to the candidate's assigned role; can be
+  // switched to any other role to see how the analysis changes for the
+  // same answers. Doesn't mutate the candidate record.
+  const [activeRoleId, setActiveRoleId] = useState(null);
+  useEffect(() => {
+    if (candidate?.roleId) setActiveRoleId(candidate.roleId);
+  }, [candidate?.id, candidate?.roleId]);
+
   const toggleLayer = (id) => {
     setLayers((prev) =>
       prev.includes(id) ? prev.filter((l) => l !== id) : [...prev, id]
     );
   };
 
-  const report = useMemo(() => {
+  // Candidate-intrinsic data (independent of role): 5 dim scores + facets.
+  const candidateScores = useMemo(() => {
     if (!candidate || !candidate.answers) return null;
-    const role = getRole(candidate.roleId);
     const tier = candidate.tier || 'standard';
     const tierItems = getTierItems(tier);
     const tierMeta = getTierMeta(tier);
     const { normalized: scores } = calculateScores(candidate.answers, tierItems);
     const facets =
       tier === 'deep' ? calculateFacetScores(candidate.answers, tierItems) : null;
-    const { fit, dimFit } = calculateFit(scores, role);
-    const insights = generateInsights(scores, role);
+    return { tier, tierMeta, scores, facets };
+  }, [candidate]);
+
+  // Fit per role — used by the comparison strip. Cheap to compute.
+  const rolesData = useMemo(() => {
+    if (!candidateScores) return [];
+    return roles
+      .map((r) => ({ role: r, fit: calculateFit(candidateScores.scores, r).fit }))
+      .sort((a, b) => b.fit - a.fit);
+  }, [candidateScores, roles]);
+
+  const activeRole = useMemo(() => {
+    if (!candidate) return null;
+    return (
+      roles.find((r) => r.id === activeRoleId) ||
+      getRole(candidate.roleId) ||
+      roles.find((r) => r.id === candidate.roleId)
+    );
+  }, [activeRoleId, roles, candidate]);
+
+  // Role-dependent computations: fit, insights, radar.
+  const report = useMemo(() => {
+    if (!candidateScores || !activeRole) return null;
+    const { scores, facets, tier, tierMeta } = candidateScores;
+    const { fit, dimFit } = calculateFit(scores, activeRole);
+    const insights = generateInsights(scores, activeRole);
     const radarData = dimensionOrder.map((d) => ({
       dim: dimensions[d].name,
       candidate: scores[d],
-      ideal: role.ideal[d],
+      ideal: activeRole.ideal[d],
       fullMark: 100,
     }));
-    return { role, tier, tierMeta, scores, facets, fit, dimFit, insights, radarData };
-  }, [candidate]);
+    return { role: activeRole, tier, tierMeta, scores, facets, fit, dimFit, insights, radarData };
+  }, [candidateScores, activeRole]);
 
   // Advanced analysis — recomputes when scores/role/sector change. Other
   // controls (layers/depth) only affect rendering, not computation.
@@ -315,6 +348,13 @@ export default function Report() {
             </div>
           </div>
         )}
+
+        <RoleComparisonStrip
+          rolesData={rolesData}
+          activeRoleId={activeRoleId}
+          assignedRoleId={candidate.roleId}
+          onSelect={setActiveRoleId}
+        />
 
         {!isQuick && (
           <div className="no-print">
