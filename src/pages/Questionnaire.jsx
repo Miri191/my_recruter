@@ -7,6 +7,7 @@ import { getTierItems, getTierMeta, likertLabels } from '../data/questionnaires'
 import { dimensions } from '../data/dimensions';
 import { getRole } from '../data/roles';
 import { useApp } from '../context/AppContext';
+import { seededShuffle } from '../lib/shuffle';
 
 function WelcomeScreen({ candidate, role, tierMeta, onStart }) {
   const firstName = candidate.name.split(' ')[0];
@@ -161,7 +162,12 @@ export default function Questionnaire() {
   const candidate = getCandidate(id);
   const role = candidate ? getRole(candidate.roleId) : null;
   const tier = candidate?.tier || 'standard';
-  const tierItems = useMemo(() => getTierItems(tier), [tier]);
+  // Shuffle per-candidate so consecutive items don't all probe the same
+  // trait. Deterministic — same candidate sees the same order on refresh.
+  const tierItems = useMemo(
+    () => seededShuffle(getTierItems(tier), candidate?.id),
+    [tier, candidate?.id]
+  );
   const tierMeta = useMemo(() => getTierMeta(tier), [tier]);
 
   const [started, setStarted] = useState(false);
