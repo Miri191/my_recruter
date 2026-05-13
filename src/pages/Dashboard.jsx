@@ -68,7 +68,7 @@ export default function Dashboard() {
       avgFit = Math.round(sum / completed.length);
     }
     return { total, completed: completed.length, pending, avgFit };
-  }, [candidates]);
+  }, [candidates, getRole]);
 
   const filtered = useMemo(() => {
     return candidates.filter((c) => {

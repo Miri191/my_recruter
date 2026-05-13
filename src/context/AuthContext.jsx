@@ -12,16 +12,28 @@ export function AuthProvider({ children }) {
   const fetchProfileAndOrg = useCallback(async (userId) => {
     if (!supabase) return;
     try {
-      const { data: profileData, error } = await supabase
+      // Fetch profile and organization separately to avoid RLS join issues
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('*, organizations(*)')
+        .select('*')
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
+      if (profileError) throw profileError;
 
       setProfile(profileData);
-      setOrganization(profileData.organizations);
+      
+      // Now fetch the organization separately using organization_id from profile
+      if (profileData.organization_id) {
+        const { data: orgData, error: orgError } = await supabase
+          .from('organizations')
+          .select('*')
+          .eq('id', profileData.organization_id)
+          .single();
+
+        if (orgError) throw orgError;
+        setOrganization(orgData);
+      }
 
       // Fire-and-forget update of last_login_at.
       supabase
@@ -84,7 +96,7 @@ export function AuthProvider({ children }) {
         emailRedirectTo: `${window.location.origin}/login`,
         data: {
           full_name: fullName,
-          organization_name: organizationName,
+          organization_name: organizationName || `${fullName} Workspace`,
         },
       },
     });

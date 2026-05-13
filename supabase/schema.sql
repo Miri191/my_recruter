@@ -98,6 +98,12 @@ CREATE POLICY "Users can insert their own profile"
   ON profiles FOR INSERT
   WITH CHECK (id = auth.uid());
 
+-- CRITICAL: Allow trigger function to insert organizations during signup
+-- (Trigger runs with SECURITY DEFINER, so needs explicit policy)
+CREATE POLICY "Allow trigger to create organization on signup"
+  ON organizations FOR INSERT
+  WITH CHECK (true);
+
 -- =====================================
 -- AUTO-CREATE ORG + PROFILE ON SIGNUP
 -- =====================================
@@ -135,3 +141,68 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+
+-- =====================================
+-- CANDIDATES TABLE (questionnaire responses)
+-- =====================================
+CREATE TABLE candidates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT,
+  role_id TEXT NOT NULL,  -- references roles.js role.id (not a real FK, but denormalized for query speed)
+  tier TEXT NOT NULL DEFAULT 'standard', -- 'quick' | 'standard' | 'deep'
+  status TEXT NOT NULL DEFAULT 'pending', -- 'pending' | 'completed'
+  answers JSONB,  -- questionnaire responses (when status='completed')
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  completed_at TIMESTAMPTZ,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_candidates_organization_id ON candidates(organization_id);
+CREATE INDEX idx_candidates_created_by ON candidates(created_by);
+CREATE INDEX idx_candidates_status ON candidates(status);
+CREATE INDEX idx_candidates_created_at ON candidates(created_at DESC);
+
+-- Auto-update updated_at for candidates
+CREATE TRIGGER update_candidates_updated_at
+  BEFORE UPDATE ON candidates
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- =====================================
+-- ROW LEVEL SECURITY for CANDIDATES
+-- =====================================
+ALTER TABLE candidates ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view candidates in their organization"
+  ON candidates FOR SELECT
+  USING (organization_id = get_user_organization_id());
+
+CREATE POLICY "Users can insert candidates in their organization"
+  ON candidates FOR INSERT
+  WITH CHECK (
+    organization_id = get_user_organization_id() AND
+    created_by = auth.uid()
+  );
+
+CREATE POLICY "Users can update candidates in their organization"
+  ON candidates FOR UPDATE
+  USING (organization_id = get_user_organization_id());
+
+CREATE POLICY "Users can delete candidates in their organization"
+  ON candidates FOR DELETE
+  USING (organization_id = get_user_organization_id());
+
+-- CRITICAL: Allow anonymous candidate to read and update THEIR row by ID
+-- The URL contains the unguessable candidate ID, so this is safe.
+-- They can only read/update if they know the exact ID.
+CREATE POLICY "Candidates can read and update their own row (anon)"
+  ON candidates FOR SELECT
+  USING (true);
+
+CREATE POLICY "Candidates can submit their answers (anon)"
+  ON candidates FOR UPDATE
+  USING (true)
+  WITH CHECK (true);

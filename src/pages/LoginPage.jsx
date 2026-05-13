@@ -32,8 +32,8 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await signIn(form.email.trim(), form.password);
-      const next = location.state?.from?.pathname || '/dashboard';
-      navigate(next, { replace: true });
+      // Don't reset loading here — let auth state changes trigger redirect
+      // Loading will be handled by ProtectedRoute after auth state updates
     } catch (err) {
       setError(translateAuthError(err.message));
       setLoading(false);

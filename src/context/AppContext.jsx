@@ -175,6 +175,9 @@ export function AppProvider({ children }) {
     async ({ name, email, phone, roleId, tier }) => {
       const cleanTier = tier || 'standard';
       if (cloudMode) {
+        if (!organization || !user) {
+          throw new Error('Organization or user not loaded');
+        }
         const { data, error } = await supabase
           .from('candidates')
           .insert({
@@ -218,6 +221,9 @@ export function AppProvider({ children }) {
   const updateCandidate = useCallback(
     async (id, updates) => {
       if (cloudMode) {
+        if (!organization) {
+          throw new Error('Organization not loaded');
+        }
         const dbUpdates = {};
         if (updates.name !== undefined) dbUpdates.name = updates.name;
         if (updates.email !== undefined) dbUpdates.email = updates.email;
@@ -227,7 +233,12 @@ export function AppProvider({ children }) {
         if (updates.status !== undefined) dbUpdates.status = updates.status;
         if (updates.answers !== undefined) dbUpdates.answers = updates.answers;
         if (updates.completedAt !== undefined) dbUpdates.completed_at = updates.completedAt;
-        const { error } = await supabase.from('candidates').update(dbUpdates).eq('id', id);
+        // SECURITY: Only update candidates that belong to this organization
+        const { error } = await supabase
+          .from('candidates')
+          .update(dbUpdates)
+          .eq('id', id)
+          .eq('organization_id', organization.id);
         if (error) {
           console.error('Failed to update candidate:', error);
           throw error;
@@ -235,17 +246,22 @@ export function AppProvider({ children }) {
       }
       dispatch({ type: 'UPDATE', id, updates });
     },
-    [cloudMode]
+    [cloudMode, organization]
   );
 
   const submitAnswers = useCallback(
     async (id, answers) => {
       const completedAt = new Date().toISOString();
       if (cloudMode) {
+        if (!organization) {
+          throw new Error('Organization not loaded');
+        }
+        // SECURITY: Only update candidates that belong to this organization
         const { error } = await supabase
           .from('candidates')
           .update({ answers, status: 'completed', completed_at: completedAt })
-          .eq('id', id);
+          .eq('id', id)
+          .eq('organization_id', organization.id);
         if (error) {
           console.error('Failed to submit answers:', error);
           throw error;
@@ -257,13 +273,21 @@ export function AppProvider({ children }) {
         updates: { answers, status: 'completed', completedAt },
       });
     },
-    [cloudMode]
+    [cloudMode, organization]
   );
 
   const deleteCandidate = useCallback(
     async (id) => {
       if (cloudMode) {
-        const { error } = await supabase.from('candidates').delete().eq('id', id);
+        if (!organization) {
+          throw new Error('Organization not loaded');
+        }
+        // SECURITY: Only delete candidates that belong to this organization
+        const { error } = await supabase
+          .from('candidates')
+          .delete()
+          .eq('id', id)
+          .eq('organization_id', organization.id);
         if (error) {
           console.error('Failed to delete candidate:', error);
           throw error;
@@ -271,7 +295,7 @@ export function AppProvider({ children }) {
       }
       dispatch({ type: 'REMOVE', id });
     },
-    [cloudMode]
+    [cloudMode, organization]
   );
 
   const getCandidate = useCallback(
