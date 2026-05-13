@@ -1,17 +1,11 @@
 import { NavLink } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
-import { lock } from '../../lib/auth';
+import UserMenu from '../auth/UserMenu';
 
 const navItems = [
   { to: '/dashboard', label: 'דשבורד', n: '01', end: true },
   { to: '/new', label: 'מועמד חדש', n: '02' },
   { to: '/roles', label: 'ניהול תפקידים', n: '03' },
 ];
-
-function handleLogout() {
-  lock();
-  window.location.href = '/';
-}
 
 export default function Sidebar() {
   return (
@@ -52,21 +46,8 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="px-8 py-5 border-t border-ink-line">
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="w-full inline-flex items-center justify-between text-[12px] tracking-widish uppercase text-ink-mute hover:text-oxblood transition-colors font-medium py-2"
-        >
-          <span className="inline-flex items-center gap-2">
-            <LogOut size={14} />
-            התנתקות
-          </span>
-          <span className="text-[10px]">←</span>
-        </button>
-        <p className="text-[11px] text-ink-mute leading-relaxed mt-3">
-          הנתונים שלך נשמרים בדפדפן בלבד.
-        </p>
+      <div className="px-5 py-5 border-t border-ink-line">
+        <UserMenu />
       </div>
     </aside>
   );
