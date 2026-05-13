@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Sparkles,
@@ -12,8 +13,19 @@ import {
   ArrowLeft,
   ShieldCheck,
   Clock,
+  Zap,
+  Target,
+  Layers,
+  Check,
+  X,
+  Send,
+  CheckCircle2,
+  ArrowLeftRight,
+  Briefcase,
+  MessageSquare,
 } from 'lucide-react';
 import { dimensions, dimensionOrder } from '../data/dimensions';
+import { QUESTIONNAIRE_TIERS } from '../data/questionnaires';
 
 function Logo() {
   return (
@@ -78,6 +90,181 @@ function DimensionLegend() {
   );
 }
 
+function ContactSection() {
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    company: '',
+    plan: '',
+    message: '',
+  });
+  const [submitted, setSubmitted] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const setField = (k) => (e) => {
+    setForm((f) => ({ ...f, [k]: e.target.value }));
+    setErrors((er) => ({ ...er, [k]: undefined }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const errs = {};
+    if (!form.name.trim()) errs.name = 'שדה חובה';
+    if (!form.email.trim()) errs.email = 'שדה חובה';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = 'אימייל לא תקין';
+    if (!form.message.trim()) errs.message = 'שדה חובה';
+    setErrors(errs);
+    if (Object.keys(errs).length > 0) return;
+
+    const subject = `פנייה מ-${form.name} — Persona`;
+    const body =
+      `שם: ${form.name}\n` +
+      `אימייל: ${form.email}\n` +
+      (form.company ? `חברה: ${form.company}\n` : '') +
+      (form.plan ? `מסלול שמעניין: ${form.plan}\n` : '') +
+      `\n${form.message}`;
+    window.location.href = `mailto:miriamr@aman.co.il?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
+    setSubmitted(true);
+  };
+
+  const inputBase =
+    'w-full h-11 px-3 bg-paper-light border-2 border-ink-line text-[14px] focus:outline-none focus:border-petrol transition-colors';
+
+  return (
+    <section id="contact" className="border-b-2 border-ink py-20">
+      <div className="max-w-4xl mx-auto px-6 md:px-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-10 lg:gap-16 items-start">
+          <div>
+            <div className="eyebrow-petrol mb-3">צרי קשר</div>
+            <h2 className="display text-3xl md:text-4xl text-ink mb-5 text-balance">
+              יש לך שאלה? רעיון? צריכה מסלול מותאם?
+            </h2>
+            <p className="text-[15px] text-ink-soft leading-relaxed mb-6">
+              שלחי לי הודעה ואחזור אלייך תוך 24 שעות. ללא בוטים, ללא טפסים אוטומטיים — אני עונה אישית.
+            </p>
+            <div className="space-y-3 text-[13px] text-ink-soft">
+              <div className="flex items-center gap-2.5">
+                <Mail size={15} className="text-petrol shrink-0" />
+                <span dir="ltr">miriamr@aman.co.il</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <Clock size={15} className="text-petrol shrink-0" />
+                <span>מענה תוך 24 שעות בימי עסקים</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <ShieldCheck size={15} className="text-forest shrink-0" />
+                <span>הפרטים שלך נשארים אצלי בלבד</span>
+              </div>
+            </div>
+          </div>
+
+          {submitted ? (
+            <div className="bg-paper-light border-2 border-ink shadow-petrol p-8 text-center animate-fade-up">
+              <div className="mx-auto w-14 h-14 border-2 border-forest bg-forest-tint text-forest flex items-center justify-center mb-4">
+                <CheckCircle2 size={26} strokeWidth={1.75} />
+              </div>
+              <h3 className="display text-2xl text-ink mb-2">תודה!</h3>
+              <p className="text-[14px] text-ink-soft leading-relaxed mb-5">
+                הפנייה שלך נשלחה. במידה ולא נפתח אצלך תוכנת מייל, שלחי ישירות אל{' '}
+                <span dir="ltr" className="text-petrol font-medium">miriamr@aman.co.il</span>.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSubmitted(false);
+                  setForm({ name: '', email: '', company: '', plan: '', message: '' });
+                }}
+                className="eyebrow-petrol hover:underline-petrol font-medium"
+              >
+                שלחי הודעה נוספת
+              </button>
+            </div>
+          ) : (
+            <form
+              onSubmit={handleSubmit}
+              className="bg-paper-light border-2 border-ink p-7 md:p-8 space-y-4"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label className="block">
+                  <span className="eyebrow block mb-1.5">שם מלא *</span>
+                  <input
+                    type="text"
+                    value={form.name}
+                    onChange={setField('name')}
+                    placeholder="דנה לוי"
+                    className={inputBase}
+                  />
+                  {errors.name && <span className="text-[11px] text-oxblood mt-1 block">{errors.name}</span>}
+                </label>
+                <label className="block">
+                  <span className="eyebrow block mb-1.5">אימייל *</span>
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={setField('email')}
+                    placeholder="example@mail.com"
+                    dir="ltr"
+                    className={inputBase}
+                  />
+                  {errors.email && <span className="text-[11px] text-oxblood mt-1 block">{errors.email}</span>}
+                </label>
+                <label className="block">
+                  <span className="eyebrow block mb-1.5">חברה</span>
+                  <input
+                    type="text"
+                    value={form.company}
+                    onChange={setField('company')}
+                    placeholder="שם החברה / ארגון"
+                    className={inputBase}
+                  />
+                </label>
+                <label className="block">
+                  <span className="eyebrow block mb-1.5">מסלול שמעניין</span>
+                  <select
+                    value={form.plan}
+                    onChange={setField('plan')}
+                    className={`${inputBase} cursor-pointer`}
+                  >
+                    <option value="">בחרי...</option>
+                    <option value="בסיסי">בסיסי (חינם)</option>
+                    <option value="מקצועי">מקצועי</option>
+                    <option value="עסקי">עסקי / Enterprise</option>
+                    <option value="עוד לא בטוחה">עוד לא בטוחה</option>
+                  </select>
+                </label>
+              </div>
+              <label className="block">
+                <span className="eyebrow block mb-1.5">איך אוכל לעזור? *</span>
+                <textarea
+                  value={form.message}
+                  onChange={setField('message')}
+                  rows={4}
+                  placeholder="כתבי כמה משפטים על מה שאת מחפשת"
+                  className="w-full px-3 py-2 bg-paper-light border-2 border-ink-line text-[14px] focus:outline-none focus:border-petrol transition-colors resize-none leading-relaxed"
+                />
+                {errors.message && <span className="text-[11px] text-oxblood mt-1 block">{errors.message}</span>}
+              </label>
+
+              <div className="flex items-center justify-between gap-3 pt-2">
+                <span className="text-[11px] text-ink-mute">* שדות חובה</span>
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-2.5 h-12 px-6 bg-ink border-2 border-ink text-paper-light hover:bg-petrol hover:border-petrol text-[13px] tracking-widish uppercase font-semibold transition-all"
+                >
+                  <Send size={14} />
+                  שלחי פנייה
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Landing() {
   const navigate = useNavigate();
   const goToApp = () => navigate('/dashboard');
@@ -88,10 +275,24 @@ export default function Landing() {
       <header className="sticky top-0 z-20 bg-paper/90 backdrop-blur border-b border-ink-line">
         <div className="max-w-6xl mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
           <Logo />
-          <CTAButton onClick={goToApp} size="md">
-            כניסה למערכת
-            <ArrowLeft size={14} />
-          </CTAButton>
+          <nav className="flex items-center gap-1 md:gap-3">
+            <a
+              href="#pricing"
+              className="hidden md:inline-flex items-center h-9 px-3 text-[12px] tracking-widish uppercase font-medium text-ink-soft hover:text-petrol transition-colors"
+            >
+              מסלולים
+            </a>
+            <a
+              href="#contact"
+              className="hidden md:inline-flex items-center h-9 px-3 text-[12px] tracking-widish uppercase font-medium text-ink-soft hover:text-petrol transition-colors"
+            >
+              צור קשר
+            </a>
+            <CTAButton onClick={goToApp} size="md">
+              כניסה למערכת
+              <ArrowLeft size={14} />
+            </CTAButton>
+          </nav>
         </div>
       </header>
 
@@ -368,8 +569,101 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ===== Features ===== */}
+      {/* ===== Questionnaire tiers ===== */}
       <section className="bg-paper-light border-y-2 border-ink py-20">
+        <div className="max-w-6xl mx-auto px-6 md:px-10">
+          <div className="text-center mb-12">
+            <div className="eyebrow-petrol mb-3">3 רמות עומק</div>
+            <h2 className="display text-3xl md:text-4xl text-ink mb-4">
+              שאלון בהתאם לשלב הגיוס
+            </h2>
+            <p className="text-[15px] text-ink-soft max-w-2xl mx-auto leading-relaxed">
+              לא כל מועמד מקבל את אותו עומק בדיקה. סינון ראשוני של 30 קו"חים?
+              שאלון מהיר. מועמדת לראיון אחרון לתפקיד מפתח? שאלון מעמיק.
+            </p>
+          </div>
+
+          {(() => {
+            const tierIconMap = { Zap, Target, Layers };
+            const tierColorMap = {
+              forest: {
+                bg: 'bg-forest-tint',
+                text: 'text-forest',
+                border: 'border-forest/40',
+                solid: 'bg-forest',
+              },
+              petrol: {
+                bg: 'bg-petrol-tint',
+                text: 'text-petrol',
+                border: 'border-petrol/40',
+                solid: 'bg-petrol',
+              },
+              plum: {
+                bg: 'bg-plum-tint',
+                text: 'text-plum',
+                border: 'border-plum/40',
+                solid: 'bg-plum',
+              },
+            };
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {Object.values(QUESTIONNAIRE_TIERS).map((t) => {
+                  const Icon = tierIconMap[t.icon] || Target;
+                  const c = tierColorMap[t.color] || tierColorMap.petrol;
+                  const isStandard = t.id === 'standard';
+                  return (
+                    <article
+                      key={t.id}
+                      className={`bg-paper border-2 ${
+                        isStandard ? 'border-ink shadow-petrol' : 'border-ink-line'
+                      } p-6 relative`}
+                    >
+                      {isStandard && (
+                        <span className="absolute -top-3 right-5 inline-flex items-center gap-1 bg-ink text-paper-light text-[10px] tracking-wider2 uppercase font-semibold px-2 py-1">
+                          ★ הנפוץ ביותר
+                        </span>
+                      )}
+                      <div className={`w-12 h-12 border ${c.border} ${c.bg} ${c.text} flex items-center justify-center mb-4`}>
+                        <Icon size={22} strokeWidth={1.75} />
+                      </div>
+                      <div className="flex items-baseline gap-2 mb-1">
+                        <h3 className="display text-2xl text-ink">{t.name}</h3>
+                        <span className={`text-[11px] tracking-widish uppercase ${c.text} font-semibold`}>
+                          {t.nameEn}
+                        </span>
+                      </div>
+                      <div className="num text-[12px] tracking-widish text-ink-mute mb-3 uppercase" dir="ltr">
+                        {t.itemCount} שאלות · ~{t.estimatedMinutes} דק׳
+                      </div>
+                      <div className="rule mb-4" />
+                      <p className="text-[13px] text-ink-soft leading-relaxed mb-4">
+                        {t.fullDescription}
+                      </p>
+                      <div className="mb-3">
+                        <div className="eyebrow mb-2">מתאים ל</div>
+                        <ul className="space-y-1">
+                          {t.bestFor.slice(0, 3).map((s) => (
+                            <li key={s} className="flex gap-2 text-[12px] text-ink leading-relaxed">
+                              <Check size={12} className={`${c.text} shrink-0 mt-1`} />
+                              <span>{s}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="pt-3 border-t border-ink-line/60 text-[11px] text-ink-mute" dir="ltr">
+                        α = {t.validity.alphaRange} ({t.validity.label})
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            );
+          })()}
+        </div>
+      </section>
+
+      {/* ===== Features ===== */}
+      <section className="border-b-2 border-ink py-20">
         <div className="max-w-6xl mx-auto px-6 md:px-10">
           <div className="flex items-baseline gap-4 mb-12">
             <h2 className="display text-3xl md:text-4xl text-ink">מה תקבלי</h2>
@@ -383,7 +677,7 @@ export default function Landing() {
                 color: 'text-petrol',
                 bg: 'bg-petrol-tint border-petrol/40',
                 title: '50 שאלות BIG5 בעברית',
-                desc: 'שאלון IPIP-50 המאומת — לא חיתוך שרירותי. כתוב בעברית מקצועית ועברה התאמה תרבותית. 5 דק׳ למילוי במובייל.',
+                desc: '3 רמות עומק (20/50/120 שאלות) מבוססות IPIP. תרגום עברי מקצועי. 3—15 דק׳ במובייל.',
               },
               {
                 icon: Flag,
@@ -407,6 +701,27 @@ export default function Landing() {
                 desc: '5 ממדים ארגוניים (היררכיה, קצב, חדשנות, שיתוף, פורמליות) + רשימת ארגונים מתאימים לפרופיל.',
               },
               {
+                icon: Layers,
+                color: 'text-plum',
+                bg: 'bg-plum-tint border-plum/40',
+                title: '30 תת-מימדים (שאלון מעמיק)',
+                desc: 'IPIP-NEO-120 (Johnson 2014) — 6 תת-מימדים לכל ממד. רמת פירוט אקדמית לתפקידי מפתח.',
+              },
+              {
+                icon: ArrowLeftRight,
+                color: 'text-petrol',
+                bg: 'bg-petrol-tint border-petrol/40',
+                title: 'השוואת תפקידים',
+                desc: 'אותן תשובות BIG5 — חישוב התאמה לכל תפקיד. גלי איפה עוד המועמדת מתאימה בלחיצה.',
+              },
+              {
+                icon: Briefcase,
+                color: 'text-ink',
+                bg: 'bg-paper-dark border-ink-line',
+                title: 'תפקידים מותאמים אישית',
+                desc: 'ערכי את 6 התפקידים המובנים או צרי משלך — פרופיל אידיאלי, משקלות, תכונות חשובות.',
+              },
+              {
                 icon: FileDown,
                 color: 'text-ochre',
                 bg: 'bg-ochre-tint border-ochre/40',
@@ -418,7 +733,7 @@ export default function Landing() {
                 color: 'text-indigo',
                 bg: 'bg-indigo-tint border-indigo/40',
                 title: 'מצב סקטור מפוקח',
-                desc: 'לבנקאות, בריאות וביטחון — מסתיר תובנות שעלולות ליצור סיכון אפליה, כל פי הנחיות רגולציה.',
+                desc: 'לבנקאות, בריאות וביטחון — מסתיר תובנות שעלולות ליצור סיכון אפליה, לפי הנחיות רגולציה.',
               },
             ].map(({ icon: Icon, color, bg, title, desc }) => (
               <div key={title} className="flex gap-5">
@@ -438,6 +753,159 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      {/* ===== Pricing ===== */}
+      <section id="pricing" className="bg-paper-light border-b-2 border-ink py-20">
+        <div className="max-w-6xl mx-auto px-6 md:px-10">
+          <div className="text-center mb-12">
+            <div className="eyebrow-petrol mb-3">מסלולים</div>
+            <h2 className="display text-3xl md:text-4xl text-ink mb-4">
+              בחרי את המסלול שמתאים לך
+            </h2>
+            <p className="text-[15px] text-ink-soft max-w-2xl mx-auto leading-relaxed">
+              התחילי בחינם. שדרגי כשאת מוכנה. בטלי בכל רגע — ללא מחויבות.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {/* Plan: Free / Starter */}
+            <article className="bg-paper border-2 border-ink-line p-7 flex flex-col">
+              <div className="flex items-baseline gap-2 mb-1">
+                <h3 className="display text-2xl text-ink">בסיסי</h3>
+                <span className="eyebrow text-ink-mute">Starter</span>
+              </div>
+              <p className="text-[13px] text-ink-mute mb-5 leading-relaxed">
+                להיכרות עם המערכת ובדיקות ראשוניות.
+              </p>
+              <div className="mb-6">
+                <span className="display text-5xl text-ink leading-none">חינם</span>
+              </div>
+              <ul className="space-y-2.5 mb-6 flex-1">
+                {[
+                  '3 מועמדים בחודש',
+                  'שאלון סטנדרטי (50 שאלות)',
+                  '6 תפקידים מובנים',
+                  '5 ציוני BIG5',
+                  'דוח התאמה בסיסי',
+                ].map((s) => (
+                  <li key={s} className="flex gap-2.5 text-[13px] text-ink leading-relaxed">
+                    <Check size={14} className="text-forest shrink-0 mt-1" />
+                    <span>{s}</span>
+                  </li>
+                ))}
+                {['ניתוח מתקדם', 'ייצוא PDF', 'תפקידים מותאמים'].map((s) => (
+                  <li key={s} className="flex gap-2.5 text-[13px] text-ink-mute leading-relaxed">
+                    <X size={14} className="text-ink-line shrink-0 mt-1" />
+                    <span>{s}</span>
+                  </li>
+                ))}
+              </ul>
+              <button
+                type="button"
+                onClick={goToApp}
+                className="w-full h-12 border-2 border-ink bg-paper-light text-ink hover:bg-ink hover:text-paper-light text-[13px] tracking-widish uppercase font-semibold transition-all"
+              >
+                התחילי חינם
+              </button>
+            </article>
+
+            {/* Plan: Pro — recommended */}
+            <article className="bg-paper border-2 border-ink shadow-petrol p-7 relative flex flex-col">
+              <span className="absolute -top-3 right-5 inline-flex items-center gap-1 bg-petrol text-paper-light text-[10px] tracking-wider2 uppercase font-semibold px-2.5 py-1">
+                ★ המומלץ
+              </span>
+              <div className="flex items-baseline gap-2 mb-1">
+                <h3 className="display text-2xl text-petrol">מקצועי</h3>
+                <span className="eyebrow-petrol">Pro</span>
+              </div>
+              <p className="text-[13px] text-ink-soft mb-5 leading-relaxed">
+                לעבודת גיוס יומיומית עם מגוון תפקידים ועומקים.
+              </p>
+              <div className="mb-6">
+                <span className="display text-5xl text-ink leading-none num" dir="ltr">
+                  ₪399
+                </span>
+                <span className="text-[14px] text-ink-mute mr-2">/ חודש</span>
+              </div>
+              <ul className="space-y-2.5 mb-6 flex-1">
+                {[
+                  '50 מועמדים בחודש',
+                  '3 רמות שאלון (מהיר, סטנדרטי, מעמיק)',
+                  'יצירת תפקידים מותאמים',
+                  '3 שכבות ניתוח מתקדם (דגלים, דפוסים, תרבות)',
+                  '30 תת-מימדים בשאלון המעמיק',
+                  'השוואת תפקידים',
+                  'ייצוא PDF',
+                  'היסטוריית צפיות לקומפליאנס',
+                  'תמיכה במייל',
+                ].map((s) => (
+                  <li key={s} className="flex gap-2.5 text-[13px] text-ink leading-relaxed">
+                    <Check size={14} className="text-petrol shrink-0 mt-1" />
+                    <span>{s}</span>
+                  </li>
+                ))}
+              </ul>
+              <button
+                type="button"
+                onClick={() => {
+                  const el = document.getElementById('contact');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="w-full h-12 bg-petrol border-2 border-petrol text-paper-light hover:bg-ink hover:border-ink text-[13px] tracking-widish uppercase font-semibold transition-all"
+              >
+                להתחיל
+              </button>
+            </article>
+
+            {/* Plan: Enterprise */}
+            <article className="bg-paper border-2 border-ink-line p-7 flex flex-col">
+              <div className="flex items-baseline gap-2 mb-1">
+                <h3 className="display text-2xl text-ink">עסקי</h3>
+                <span className="eyebrow text-ink-mute">Enterprise</span>
+              </div>
+              <p className="text-[13px] text-ink-mute mb-5 leading-relaxed">
+                לארגונים גדולים, סקטורים מפוקחים, מספר משתמשים.
+              </p>
+              <div className="mb-6">
+                <span className="display text-3xl text-ink leading-none">התאמה אישית</span>
+              </div>
+              <ul className="space-y-2.5 mb-6 flex-1">
+                {[
+                  'ללא הגבלת מועמדים',
+                  'מספר משתמשים בחשבון',
+                  'מצב סקטור מפוקח (בנקאות / ביטוח / בריאות / ממשלה)',
+                  'אינטגרציה ל-ATS',
+                  'White-label למיתוג הארגון',
+                  'תמיכה ייעודית + onboarding',
+                  'הסכם DPA לפי דרישות פרטיות',
+                ].map((s) => (
+                  <li key={s} className="flex gap-2.5 text-[13px] text-ink leading-relaxed">
+                    <Check size={14} className="text-plum shrink-0 mt-1" />
+                    <span>{s}</span>
+                  </li>
+                ))}
+              </ul>
+              <button
+                type="button"
+                onClick={() => {
+                  const el = document.getElementById('contact');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="w-full h-12 border-2 border-ink bg-paper-light text-ink hover:bg-ink hover:text-paper-light text-[13px] tracking-widish uppercase font-semibold transition-all"
+              >
+                צרי קשר
+              </button>
+            </article>
+          </div>
+
+          <p className="text-center text-[12px] text-ink-mute mt-8 leading-relaxed">
+            כל המחירים בש"ח, ללא מע"מ. תשלום חודשי, ביטול בכל רגע. שאלות? <a href="#contact" className="text-petrol hover:underline-petrol font-medium">דברו איתנו</a>.
+          </p>
+        </div>
+      </section>
+
+      {/* ===== Contact form ===== */}
+      <ContactSection />
 
       {/* ===== Final CTA ===== */}
       <section className="max-w-4xl mx-auto px-6 md:px-10 py-24 text-center">
