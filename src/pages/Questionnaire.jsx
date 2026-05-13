@@ -4,7 +4,6 @@ import MobileFrame from '../components/layout/MobileFrame';
 import ProgressBar from '../components/ui/ProgressBar';
 import Button from '../components/ui/Button';
 import { getTierItems, getTierMeta, likertLabels } from '../data/questionnaires';
-import { dimensions } from '../data/dimensions';
 import { getRole } from '../data/roles';
 import { useApp } from '../context/AppContext';
 import { seededShuffle } from '../lib/shuffle';
@@ -70,7 +69,6 @@ function WelcomeScreen({ candidate, role, tierMeta, onStart }) {
 function QuestionScreen({ items, index, answer, onAnswer, onPrev, onNext }) {
   const total = items.length;
   const item = items[index];
-  const dim = dimensions[item.dimension === 'N' ? 'S' : item.dimension];
   const progress = ((index + 1) / total) * 100;
   const num = String(index + 1).padStart(2, '0');
 
@@ -78,9 +76,9 @@ function QuestionScreen({ items, index, answer, onAnswer, onPrev, onNext }) {
     <div className="min-h-screen md:min-h-[760px] flex flex-col bg-paper-light">
       <div className="sticky top-0 z-10 bg-paper-light/95 backdrop-blur-sm px-7 md:px-9 pt-5 pb-4 border-b border-ink-line">
         <div className="flex items-center justify-between mb-3">
-          <span className={`inline-flex items-center gap-1.5 border font-semibold uppercase text-[10px] tracking-wider2 px-2 py-[3px] ${dim.classes.bgGhost} ${dim.classes.text} ${dim.classes.borderSoft}`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${dim.classes.dot}`} />
-            {dim.key} · {dim.name}
+          <span className="inline-flex items-center gap-1.5 text-[11px] tracking-widish uppercase font-semibold text-petrol">
+            <span className="w-1.5 h-1.5 rounded-full bg-petrol" />
+            שאלון אישיותי
           </span>
           <span className="num text-[12px] tracking-widish text-ink-mute" dir="ltr">
             {num} / {total}
@@ -92,7 +90,7 @@ function QuestionScreen({ items, index, answer, onAnswer, onPrev, onNext }) {
       <div className="flex-1 px-7 md:px-9 py-8 flex flex-col">
         <div className="mb-8">
           <div className="num text-[11px] tracking-widish text-petrol mb-3 font-medium" dir="ltr">
-            QUESTION № {num}
+            שאלה {num}
           </div>
           <h2 className="display text-[26px] md:text-[28px] text-ink leading-[1.25] text-balance">
             {item.text}
