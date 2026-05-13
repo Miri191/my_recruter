@@ -3,8 +3,27 @@ import { v4 as uuid } from 'uuid';
 import { loadAll, saveAll, upsertCustomRole, removeCustomRole } from '../lib/storage';
 import { getRoles, isDefaultRoleId } from '../data/roles';
 import { STANDARD_ITEMS } from '../data/questionnaires';
+import { supabase, isSupabaseEnabled } from '../lib/supabase';
+import { useAuth } from './AuthContext';
 
 const AppContext = createContext(null);
+
+// ---------- transformers between DB (snake_case) and JS (camelCase) ----------
+function fromDbRow(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    phone: row.phone,
+    roleId: row.role_id,
+    tier: row.tier || 'standard',
+    status: row.status,
+    answers: row.answers,
+    createdAt: row.created_at,
+    completedAt: row.completed_at,
+  };
+}
 
 function reducer(state, action) {
   switch (action.type) {
@@ -31,19 +50,15 @@ function reducer(state, action) {
   }
 }
 
-// Generate plausible answers for a target BIG5 profile (0-100 per dim).
-// Used to populate the seeded demo candidate so the report shows
-// meaningful data on first load.
+// ---------- localStorage-mode seed ----------
 function generateDemoAnswers(targets) {
   const answers = {};
   STANDARD_ITEMS.forEach((item) => {
     const dim = item.dimension === 'N' ? 'S' : item.dimension;
     const target = targets[dim] ?? 50;
-    // Convert 0-100 target into a 1-5 scale value.
     const v15 = Math.round((target / 100) * 4 + 1);
     let answer;
     if (item.dimension === 'N') {
-      // Scoring flips N → S, so for N+ items respond inversely to target.
       answer = item.reverse ? v15 : 6 - v15;
     } else {
       answer = item.reverse ? 6 - v15 : v15;
@@ -99,93 +114,191 @@ function seedIfEmpty(existing) {
   ];
 }
 
+// ============================================================
+// PROVIDER
+// ============================================================
 export function AppProvider({ children }) {
+  const auth = useAuth();
+  const { isAuthenticated, organization, user, loading: authLoading } = auth;
+
+  // Cloud mode: real user in an org via Supabase.
+  // Otherwise: local mode (legacy AuthGate + localStorage demo data).
+  const cloudMode = isSupabaseEnabled && isAuthenticated && !!organization;
+
   const [state, dispatch] = useReducer(reducer, {
     candidates: [],
     ready: false,
     toast: null,
   });
 
+  // Load candidates whenever mode/auth changes.
   useEffect(() => {
-    const stored = loadAll();
-    const seeded = seedIfEmpty(stored.candidates);
-    if (seeded !== stored.candidates) saveAll({ candidates: seeded });
-    dispatch({ type: 'HYDRATE', payload: seeded });
-  }, []);
+    if (authLoading) return;
+    let cancelled = false;
 
+    async function load() {
+      if (cloudMode) {
+        const { data, error } = await supabase
+          .from('candidates')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (cancelled) return;
+        if (error) {
+          console.error('Failed to load candidates from Supabase:', error);
+          dispatch({ type: 'HYDRATE', payload: [] });
+          return;
+        }
+        dispatch({ type: 'HYDRATE', payload: data.map(fromDbRow) });
+      } else {
+        // Local mode: load from localStorage + seed demo candidates if empty
+        const stored = loadAll();
+        const seeded = seedIfEmpty(stored.candidates);
+        if (seeded !== stored.candidates) saveAll({ candidates: seeded });
+        dispatch({ type: 'HYDRATE', payload: seeded });
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, cloudMode]);
+
+  // Persist to localStorage in local mode only.
   useEffect(() => {
     if (!state.ready) return;
+    if (cloudMode) return;
     saveAll({ candidates: state.candidates });
-  }, [state.candidates, state.ready]);
+  }, [state.candidates, state.ready, cloudMode]);
 
-  const createCandidate = useCallback(({ name, email, phone, roleId, tier }) => {
-    const c = {
-      id: uuid(),
-      name,
-      email,
-      phone,
-      roleId,
-      tier: tier || 'standard',
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-      completedAt: null,
-      answers: null,
-    };
-    dispatch({ type: 'ADD', payload: c });
-    return c;
-  }, []);
+  // ---------- CRUD ----------
+  const createCandidate = useCallback(
+    async ({ name, email, phone, roleId, tier }) => {
+      const cleanTier = tier || 'standard';
+      if (cloudMode) {
+        const { data, error } = await supabase
+          .from('candidates')
+          .insert({
+            organization_id: organization.id,
+            created_by: user.id,
+            name,
+            email,
+            phone,
+            role_id: roleId,
+            tier: cleanTier,
+            status: 'pending',
+          })
+          .select()
+          .single();
+        if (error) {
+          console.error('Failed to create candidate:', error);
+          throw error;
+        }
+        const c = fromDbRow(data);
+        dispatch({ type: 'ADD', payload: c });
+        return c;
+      }
+      const c = {
+        id: uuid(),
+        name,
+        email,
+        phone,
+        roleId,
+        tier: cleanTier,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        completedAt: null,
+        answers: null,
+      };
+      dispatch({ type: 'ADD', payload: c });
+      return c;
+    },
+    [cloudMode, organization, user]
+  );
 
-  const updateCandidate = useCallback((id, updates) => {
-    dispatch({ type: 'UPDATE', id, updates });
-  }, []);
+  const updateCandidate = useCallback(
+    async (id, updates) => {
+      if (cloudMode) {
+        const dbUpdates = {};
+        if (updates.name !== undefined) dbUpdates.name = updates.name;
+        if (updates.email !== undefined) dbUpdates.email = updates.email;
+        if (updates.phone !== undefined) dbUpdates.phone = updates.phone;
+        if (updates.roleId !== undefined) dbUpdates.role_id = updates.roleId;
+        if (updates.tier !== undefined) dbUpdates.tier = updates.tier;
+        if (updates.status !== undefined) dbUpdates.status = updates.status;
+        if (updates.answers !== undefined) dbUpdates.answers = updates.answers;
+        if (updates.completedAt !== undefined) dbUpdates.completed_at = updates.completedAt;
+        const { error } = await supabase.from('candidates').update(dbUpdates).eq('id', id);
+        if (error) {
+          console.error('Failed to update candidate:', error);
+          throw error;
+        }
+      }
+      dispatch({ type: 'UPDATE', id, updates });
+    },
+    [cloudMode]
+  );
 
-  const submitAnswers = useCallback((id, answers) => {
-    dispatch({
-      type: 'UPDATE',
-      id,
-      updates: {
-        answers,
-        status: 'completed',
-        completedAt: new Date().toISOString(),
-      },
-    });
-  }, []);
+  const submitAnswers = useCallback(
+    async (id, answers) => {
+      const completedAt = new Date().toISOString();
+      if (cloudMode) {
+        const { error } = await supabase
+          .from('candidates')
+          .update({ answers, status: 'completed', completed_at: completedAt })
+          .eq('id', id);
+        if (error) {
+          console.error('Failed to submit answers:', error);
+          throw error;
+        }
+      }
+      dispatch({
+        type: 'UPDATE',
+        id,
+        updates: { answers, status: 'completed', completedAt },
+      });
+    },
+    [cloudMode]
+  );
 
-  const deleteCandidate = useCallback((id) => {
-    dispatch({ type: 'REMOVE', id });
-  }, []);
+  const deleteCandidate = useCallback(
+    async (id) => {
+      if (cloudMode) {
+        const { error } = await supabase.from('candidates').delete().eq('id', id);
+        if (error) {
+          console.error('Failed to delete candidate:', error);
+          throw error;
+        }
+      }
+      dispatch({ type: 'REMOVE', id });
+    },
+    [cloudMode]
+  );
 
   const getCandidate = useCallback(
     (id) => state.candidates.find((c) => c.id === id),
     [state.candidates]
   );
 
+  // ---------- Toast ----------
   const showToast = useCallback((message, tone = 'success') => {
     dispatch({ type: 'TOAST', payload: { message, tone, id: Date.now() } });
   }, []);
-
   const clearToast = useCallback(() => {
     dispatch({ type: 'TOAST', payload: null });
   }, []);
 
-  // ----- Roles -----
+  // ---------- Roles (still localStorage in Phase 2 — no roles table yet) ----------
   const [rolesVersion, setRolesVersion] = useState(0);
   const roles = useMemo(() => getRoles(), [rolesVersion]);
   const getRole = useCallback((id) => roles.find((r) => r.id === id), [roles]);
-
   const saveRole = useCallback((role) => {
     upsertCustomRole(role);
     setRolesVersion((v) => v + 1);
   }, []);
-
-  const deleteRole = useCallback(
-    (id) => {
-      removeCustomRole(id);
-      setRolesVersion((v) => v + 1);
-    },
-    []
-  );
-
+  const deleteRole = useCallback((id) => {
+    removeCustomRole(id);
+    setRolesVersion((v) => v + 1);
+  }, []);
   const resetRole = useCallback((id) => {
     if (!isDefaultRoleId(id)) return;
     removeCustomRole(id);
@@ -197,6 +310,7 @@ export function AppProvider({ children }) {
       candidates: state.candidates,
       ready: state.ready,
       toast: state.toast,
+      cloudMode,
       createCandidate,
       updateCandidate,
       submitAnswers,
@@ -204,7 +318,6 @@ export function AppProvider({ children }) {
       getCandidate,
       showToast,
       clearToast,
-      // Roles
       roles,
       getRole,
       saveRole,
@@ -213,6 +326,7 @@ export function AppProvider({ children }) {
     }),
     [
       state,
+      cloudMode,
       createCandidate,
       updateCandidate,
       submitAnswers,

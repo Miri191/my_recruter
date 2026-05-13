@@ -7,6 +7,7 @@ import { getTierItems, getTierMeta, likertLabels } from '../data/questionnaires'
 import { getRole } from '../data/roles';
 import { useApp } from '../context/AppContext';
 import { seededShuffle } from '../lib/shuffle';
+import { supabase, isSupabaseEnabled } from '../lib/supabase';
 
 function WelcomeScreen({ candidate, role, tierMeta, onStart }) {
   const firstName = candidate.name.split(' ')[0];
@@ -152,12 +153,63 @@ function QuestionScreen({ items, index, answer, onAnswer, onPrev, onNext }) {
   );
 }
 
+function fromDbRow(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    phone: row.phone,
+    roleId: row.role_id,
+    tier: row.tier || 'standard',
+    status: row.status,
+    answers: row.answers,
+    createdAt: row.created_at,
+    completedAt: row.completed_at,
+  };
+}
+
 export default function Questionnaire() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getCandidate, submitAnswers, ready } = useApp();
+  const { getCandidate, submitAnswers: submitViaContext, ready } = useApp();
 
-  const candidate = getCandidate(id);
+  // In cloud mode the candidate is anonymous — we must fetch their row
+  // directly via Supabase (RLS allows anon SELECT by id).
+  // In local mode we fall back to AppContext (localStorage).
+  const [candidate, setCandidate] = useState(null);
+  const [loadingCandidate, setLoadingCandidate] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadCandidate() {
+      if (isSupabaseEnabled) {
+        const { data, error } = await supabase
+          .from('candidates')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
+        if (cancelled) return;
+        if (error || !data) {
+          setCandidate(null);
+        } else {
+          setCandidate(fromDbRow(data));
+        }
+        setLoadingCandidate(false);
+      } else {
+        // Local mode — wait for AppContext to be ready.
+        if (ready) {
+          setCandidate(getCandidate(id) || null);
+          setLoadingCandidate(false);
+        }
+      }
+    }
+    loadCandidate();
+    return () => {
+      cancelled = true;
+    };
+  }, [id, ready, getCandidate]);
+
   const role = candidate ? getRole(candidate.roleId) : null;
   const tier = candidate?.tier || 'standard';
   // Shuffle per-candidate so consecutive items don't all probe the same
@@ -173,10 +225,10 @@ export default function Questionnaire() {
   const [answers, setAnswers] = useState({});
 
   useEffect(() => {
-    if (ready && candidate && candidate.status === 'completed') {
+    if (candidate && candidate.status === 'completed') {
       navigate(`/q/${id}/done`, { replace: true });
     }
-  }, [ready, candidate, id, navigate]);
+  }, [candidate, id, navigate]);
 
   const total = tierItems.length;
   const currentAnswer = useMemo(
@@ -184,7 +236,15 @@ export default function Questionnaire() {
     [answers, index, tierItems]
   );
 
-  if (!ready) return null;
+  if (loadingCandidate) {
+    return (
+      <MobileFrame>
+        <div className="min-h-screen md:min-h-[760px] flex items-center justify-center">
+          <div className="w-10 h-10 border-2 border-petrol border-t-transparent rounded-full animate-spin" />
+        </div>
+      </MobileFrame>
+    );
+  }
 
   if (!candidate) {
     return (
@@ -205,11 +265,24 @@ export default function Questionnaire() {
     if (index < total - 1) setTimeout(() => setIndex((i) => i + 1), 320);
   };
 
-  const onNext = () => {
+  const submitAnswers = async () => {
+    if (isSupabaseEnabled) {
+      const completedAt = new Date().toISOString();
+      const { error } = await supabase
+        .from('candidates')
+        .update({ answers, status: 'completed', completed_at: completedAt })
+        .eq('id', id);
+      if (error) console.error('Failed to submit answers:', error);
+    } else {
+      await submitViaContext(id, answers);
+    }
+  };
+
+  const onNext = async () => {
     if (index < total - 1) {
       setIndex((i) => i + 1);
     } else {
-      submitAnswers(id, answers);
+      await submitAnswers();
       navigate(`/q/${id}/done`, { replace: true });
     }
   };
